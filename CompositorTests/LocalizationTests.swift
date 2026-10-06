@@ -51,9 +51,27 @@ struct LocalizationTests {
     }
 
     @Test func appLanguageResolvesChineseAndFallbackLocales() {
-        #expect(AppLanguageStore(defaults: .standard, systemLocale: Locale(identifier: "zh_CN"), initial: .system).locale.identifier.lowercased().contains("zh"))
-        #expect(AppLanguageStore(defaults: .standard, systemLocale: Locale(identifier: "de_DE"), initial: .system).locale.identifier.hasPrefix("en"))
-        #expect(AppLanguageStore(defaults: .standard, systemLocale: Locale(identifier: "en_US"), initial: .simplifiedChinese).locale.identifier.lowercased().contains("zh"))
+        #expect(AppLanguageStore(defaults: .standard, systemLocale: Locale(identifier: "zh_CN"), initial: .system, simplifiedChineseAvailable: true).locale.identifier.lowercased().contains("zh"))
+        #expect(AppLanguageStore(defaults: .standard, systemLocale: Locale(identifier: "de_DE"), initial: .system, simplifiedChineseAvailable: true).locale.identifier.hasPrefix("en"))
+        #expect(AppLanguageStore(defaults: .standard, systemLocale: Locale(identifier: "en_US"), initial: .simplifiedChinese, simplifiedChineseAvailable: true).locale.identifier.lowercased().contains("zh"))
+    }
+
+    @Test func englishOnlyPackageHidesChineseAndFallsBackSafely() {
+        let suite = "LocalizationTests.\(UUID().uuidString)"
+        let defaults = UserDefaults(suiteName: suite)!
+        defaults.removePersistentDomain(forName: suite)
+        defaults.set(AppLanguage.simplifiedChinese.rawValue, forKey: AppLanguageStore.storageKey)
+
+        let store = AppLanguageStore(
+            defaults: defaults,
+            systemLocale: Locale(identifier: "zh_CN"),
+            simplifiedChineseAvailable: false
+        )
+        #expect(store.supportsSimplifiedChinese == false)
+        #expect(store.selection == .english)
+        #expect(store.locale.identifier.hasPrefix("en"))
+        #expect(defaults.stringArray(forKey: AppLanguageStore.nativeMenuLanguagesKey) == ["en"])
+        defaults.removePersistentDomain(forName: suite)
     }
 
     @Test func representativeChineseStringsRender() {

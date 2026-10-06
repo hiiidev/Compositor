@@ -9,7 +9,9 @@ struct SettingsView: View {
             Picker(L10n.key("settings.language"), selection: $languageStore.selection) {
                 Text(L10n.key("settings.language.system")).tag(AppLanguage.system)
                 Text(L10n.key("settings.language.english")).tag(AppLanguage.english)
-                Text(L10n.key("settings.language.chinese")).tag(AppLanguage.simplifiedChinese)
+                if languageStore.supportsSimplifiedChinese {
+                    Text(L10n.key("settings.language.chinese")).tag(AppLanguage.simplifiedChinese)
+                }
             }
             .pickerStyle(.menu)
 
