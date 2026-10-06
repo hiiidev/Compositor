@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct CameraRawCurveControls: View {
-    @Bindable var session: EditorSession
+    @ObservedObject var session: EditorSession
     private var raw: CameraRawSettings { session.filterEdit?.settings.cameraRaw ?? CameraRawSettings() }
     private var edit: FilterEdit? { session.filterEdit }
     /// What a drag in the graph is moving, picked when it starts and kept until it ends, as Image › Curves does: a
@@ -260,7 +260,7 @@ private enum CurvePreset: Hashable {
 }
 
 struct CameraRawMixerControls: View {
-    @Bindable var session: EditorSession
+    @ObservedObject var session: EditorSession
     private var raw: CameraRawSettings { session.filterEdit?.settings.cameraRaw ?? CameraRawSettings() }
     private var edit: FilterEdit? { session.filterEdit }
     /// What a drag in the graph is moving, picked when it starts and kept until it ends, as Image › Curves does: a
@@ -424,7 +424,7 @@ struct CameraRawMixerControls: View {
 }
 
 struct CameraRawGradingControls: View {
-    @Bindable var session: EditorSession
+    @ObservedObject var session: EditorSession
     private var raw: CameraRawSettings { session.filterEdit?.settings.cameraRaw ?? CameraRawSettings() }
     private var page: CameraRawGradePage { session.filterEdit?.cameraRawGradePage ?? .threeWay }
 

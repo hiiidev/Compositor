@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct BrushControls: View {
-    @Bindable var session: EditorSession
+    @ObservedObject var session: EditorSession
     var body: some View {
         HStack(spacing: 12) {
             Text(session.tool == .spotHealing ? "Spot Healing" : session.tool == .cloneStamp ? "Clone Stamp" : session.tool == .blur ? "Smear" : session.brushMode == .erase ? "Eraser" : "Brush").font(ToolHeaderStyle.titleFont)

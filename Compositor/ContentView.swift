@@ -4,7 +4,7 @@ import UniformTypeIdentifiers
 struct ContentView: View {
     /// The Layers panel's width, remembered across launches.
     @AppStorage("layersPanelWidth") private var layersPanelWidth = 252.0
-    @Bindable var session: EditorSession
+    @ObservedObject var session: EditorSession
     var applicationDelegate: CompositorApplicationDelegate? = nil
     @State private var canvasFrame: CGRect = .zero
     @State private var levelsPanel = FloatingPanelController(name: "levelsPanel")

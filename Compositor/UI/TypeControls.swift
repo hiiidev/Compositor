@@ -2,7 +2,7 @@ import SwiftUI
 import AppKit
 
 struct TypeControls: View {
-    @Bindable var session: EditorSession
+    @ObservedObject var session: EditorSession
     private func value<T>(_ key: WritableKeyPath<LayerTextStyle, T>) -> Binding<T> {
         Binding(get: { session.currentTextStyle[keyPath: key] }, set: { value in
             session.changeTextStyle { $0[keyPath: key] = value }
