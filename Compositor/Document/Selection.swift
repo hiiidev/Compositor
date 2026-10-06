@@ -280,9 +280,12 @@ extension EditorSession {
     func endSelectionMove() {
         guard let origin = selectionMoveOrigin else { return }
         let final = selectionMovePreview ?? origin
+        if var document, document.selection != final {
+            document.selection = final
+            self.document = document
+        }
         selectionMoveOrigin = nil
         selectionMovePreview = nil
-        if document?.selection != final { document?.selection = final }
         endEdit()
     }
 
