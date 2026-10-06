@@ -528,7 +528,7 @@ final class CanvasView: NSView {
         let documentID: UUID?
         let size: CGSize?
         let renderBounds: CGRect?
-        let viewport: CanvasViewport
+        var viewport: CanvasViewport
         let layers: [Layer]
         /// Folders have no pixels, so their masks are tracked apart from `layers`.
         struct FolderMask: Equatable {
@@ -542,6 +542,22 @@ final class CanvasView: NSView {
         let textTransform: LayerTransform?
         /// The mask shown by itself, which may be one the composite doesn't draw (disabled, or a folder's).
         let maskAlone: ObjectIdentifier?
+    }
+
+    private func synchronizeViewport() {
+        guard var state = displayedState else {
+            _ = synchronizeDisplay()
+            return
+        }
+        guard state.viewport != session.viewport else { return }
+        state.viewport = session.viewport
+        displayedState = state
+        synchronizeInlineText()
+        needsDisplay = true
+        lines.needsDisplay = true
+        transformOverlay.needsDisplay = true
+        redrawRulers()
+        updateBrushCursor()
     }
 
     @discardableResult
@@ -649,6 +665,16 @@ final class CanvasView: NSView {
         session.refreshCanvasPreview = { [weak self] in
             self?.synchronizeDisplay()
             self?.displayIfNeeded()
+        }
+        session.refreshViewportPreview = { [weak self] in
+            self?.synchronizeViewport()
+        }
+        session.refreshCanvasInteraction = { [weak self] in
+            guard let self else { return }
+            _ = self.synchronizeDisplay()
+            self.needsDisplay = true
+            self.lines.needsDisplay = true
+            self.transformOverlay.needsDisplay = true
         }
         addSubview(lines)
         addSubview(transformOverlay)
@@ -2116,15 +2142,11 @@ final class CanvasView: NSView {
             session.viewport.translate(by: CGSize(width: event.scrollingDeltaX * multiplier,
                                                   height: event.scrollingDeltaY * multiplier))
         }
-        // The macOS 12 Combine compatibility layer can defer the SwiftUI representable update
-        // until event tracking yields. Keep navigation visually live, as upstream Observation does.
-        synchronizeDisplay()
     }
     override func magnify(with event: NSEvent) {
         guard transformDrag == nil, cropDrag == nil, !guideDragging, session.brushStroke == nil, session.warpStroke == nil else { return }
         session.zoom(to: session.viewport.zoom * (1 + event.magnification),
                      anchor: convert(event.locationInWindow, from: nil))
-        synchronizeDisplay()
     }
     override func keyDown(with event: NSEvent) {
         let physicalKey = event.keyCode
