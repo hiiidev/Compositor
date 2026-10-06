@@ -1,0 +1,165 @@
+name: Release macOS Universal RC 4
+
+on:
+  push:
+    branches:
+      - release-v1.4.5-macos-rc4
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-v1.4.5-macos-rc4
+  cancel-in-progress: false
+
+jobs:
+  release:
+    name: Build and publish v1.4.5-macos-rc4
+    runs-on: macos-26
+    env:
+      VERSION: "1.4.5"
+      TAG: "v1.4.5-macos-rc4"
+      PACKAGE: "Compositor-1.4.5-macOS-Universal-RC4"
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Select Xcode 26.6
+        run: |
+          sudo xcode-select -s /Applications/Xcode_26.6.app
+          xcodebuild -version
+          sw_vers
+          uname -m
+
+      - name: Confirm upstream version
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          upstream="$(gh api repos/robbietilton/Compositor/releases/latest --jq .tag_name)"
+          echo "Latest upstream release: $upstream"
+          if [[ "$upstream" != "v$VERSION" ]]; then
+            echo "::error::Upstream is $upstream, not v$VERSION. Sync upstream before publishing."
+            exit 1
+          fi
+          grep -q "MARKETING_VERSION = $VERSION;" Compositor.xcodeproj/project.pbxproj
+
+      - name: Resolve packages
+        run: |
+          xcodebuild -resolvePackageDependencies \
+            -project Compositor.xcodeproj \
+            -scheme Compositor \
+            -onlyUsePackageVersionsFromResolvedFile
+
+      - name: Build Universal 2 Release
+        run: |
+          xcodebuild \
+            -project Compositor.xcodeproj \
+            -scheme Compositor \
+            -configuration Release \
+            -destination "generic/platform=macOS" \
+            -derivedDataPath "$RUNNER_TEMP/CompositorUniversal" \
+            ARCHS="arm64 x86_64" \
+            ONLY_ACTIVE_ARCH=NO \
+            MACOSX_DEPLOYMENT_TARGET=14.0 \
+            CODE_SIGN_STYLE=Manual \
+            CODE_SIGN_IDENTITY="-" \
+            DEVELOPMENT_TEAM="" \
+            ENABLE_HARDENED_RUNTIME=NO
+
+      - name: Verify Universal 2 app
+        run: |
+          APP="$RUNNER_TEMP/CompositorUniversal/Build/Products/Release/Compositor.app"
+          test -d "$APP"
+          codesign --verify --deep --strict "$APP"
+
+          main="$APP/Contents/MacOS/Compositor"
+          archs="$(lipo -archs "$main")"
+          echo "Compositor architectures: $archs"
+          [[ "$archs" == *arm64* ]]
+          [[ "$archs" == *x86_64* ]]
+
+          min_version="$(defaults read "$APP/Contents/Info" LSMinimumSystemVersion)"
+          echo "Minimum macOS: $min_version"
+          [[ "$min_version" == "14.0" ]]
+
+          failed=0
+          while IFS= read -r -d '' file; do
+            if file "$file" | grep -q "Mach-O"; then
+              binary_archs="$(lipo -archs "$file" 2>/dev/null || true)"
+              echo "$binary_archs  $file"
+              if [[ "$binary_archs" != *arm64* || "$binary_archs" != *x86_64* ]]; then
+                echo "::error::$file is not Universal 2: $binary_archs"
+                failed=1
+              fi
+            fi
+          done < <(find "$APP" -type f -print0)
+          [[ "$failed" -eq 0 ]]
+
+      - name: Create package
+        run: |
+          APP="$RUNNER_TEMP/CompositorUniversal/Build/Products/Release/Compositor.app"
+          codesign --force --deep --sign - "$APP"
+          codesign --verify --deep --strict "$APP"
+
+          ditto -c -k --sequesterRsrc --keepParent \
+            "$APP" \
+            "$GITHUB_WORKSPACE/$PACKAGE.zip"
+
+          shasum -a 256 "$PACKAGE.zip" | tee "$RUNNER_TEMP/SHA256SUMS.txt"
+
+      - name: Verify packaged app
+        run: |
+          DIR="$RUNNER_TEMP/check-$PACKAGE"
+          mkdir -p "$DIR"
+          ditto -x -k "$PACKAGE.zip" "$DIR"
+          APP="$DIR/Compositor.app"
+          test -d "$APP"
+          codesign --verify --deep --strict "$APP"
+
+          archs="$(lipo -archs "$APP/Contents/MacOS/Compositor")"
+          [[ "$archs" == *arm64* ]]
+          [[ "$archs" == *x86_64* ]]
+          [[ "$(defaults read "$APP/Contents/Info" LSMinimumSystemVersion)" == "14.0" ]]
+
+      - name: Publish GitHub prerelease
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            echo "::error::Release $TAG already exists."
+            exit 1
+          fi
+
+          SHA="$(shasum -a 256 "$PACKAGE.zip" | awk '{print $1}')"
+
+          cat > "$RUNNER_TEMP/release-notes.md" <<EOF
+          Clean compatibility test build based on upstream **Compositor v$VERSION**.
+
+          This RC intentionally keeps the upstream 1.4.5 editor architecture and behavior intact. It does **not** include the earlier macOS 12 compatibility layer or localization changes.
+
+          `$PACKAGE.zip`
+
+          The package is **Universal 2** and contains **arm64 + x86_64**. Requires **macOS 14.0 Sonoma or later**.
+
+          Please focus testing on:
+          - canvas creation, zooming, panning and general interaction performance
+          - layer visibility and layer editing
+          - PSD import and layer visibility after import
+          - text, selection, crop, transform, brush and gradient tools
+          - opening/saving projects and PNG/JPEG export
+          - RAW import
+
+          ### SHA-256
+
+          `$SHA  $PACKAGE.zip`
+
+          This build is ad-hoc signed rather than notarized.
+          EOF
+
+          gh release create "$TAG" \
+            "$PACKAGE.zip" \
+            --target "$GITHUB_SHA" \
+            --title "Compositor $VERSION — macOS Universal RC 4" \
+            --notes-file "$RUNNER_TEMP/release-notes.md" \
+            --prerelease
