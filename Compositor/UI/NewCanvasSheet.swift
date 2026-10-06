@@ -41,7 +41,7 @@ struct NewCanvasSheet: View {
                             .contentShape(Rectangle())
                             .padding(.trailing, -10)
                     }
-                    .menuStyle(.button).buttonStyle(.plain).menuIndicator(.hidden).fixedSize()
+                    .buttonStyle(.plain).menuIndicator(.hidden).fixedSize()
                     .help("Preset sizes for screens and common formats")
                     .accessibilityLabel("Preset sizes")
                 }
