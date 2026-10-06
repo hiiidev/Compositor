@@ -84,6 +84,8 @@ final class CanvasView: NSView {
     }
     private let transformOverlay: TransformOverlay
     private var displayedState: DisplayState?
+    private var displaySyncScheduled = false
+    private var viewportSyncScheduled = false
     private var displayedTool: NavigationTool?
     private var displayedPicking = false
     private var displayedTargeting = false
@@ -544,7 +546,36 @@ final class CanvasView: NSView {
         let maskAlone: ObjectIdentifier?
     }
 
+    private func refreshCanvasOverlays() {
+        lines.needsDisplay = true
+        transformOverlay.needsDisplay = true
+        redrawRulers()
+    }
+
+    private func scheduleDisplaySynchronization() {
+        guard !displaySyncScheduled else { return }
+        displaySyncScheduled = true
+        DispatchQueue.main.async { [weak self] in
+            guard let self, self.displaySyncScheduled else { return }
+            self.displaySyncScheduled = false
+            self.viewportSyncScheduled = false
+            _ = self.synchronizeDisplay()
+        }
+    }
+
+    private func scheduleViewportSynchronization() {
+        guard !displaySyncScheduled, !viewportSyncScheduled else { return }
+        viewportSyncScheduled = true
+        DispatchQueue.main.async { [weak self] in
+            guard let self, self.viewportSyncScheduled else { return }
+            self.viewportSyncScheduled = false
+            guard !self.displaySyncScheduled else { return }
+            self.synchronizeViewport()
+        }
+    }
+
     private func synchronizeViewport() {
+        viewportSyncScheduled = false
         guard var state = displayedState else {
             _ = synchronizeDisplay()
             return
@@ -562,6 +593,8 @@ final class CanvasView: NSView {
 
     @discardableResult
     func synchronizeDisplay() -> Bool {
+        displaySyncScheduled = false
+        viewportSyncScheduled = false
         // The stroke is over: what its surface holds stands in until the layer's own effects have been rebuilt from
         // the pixels it left, so nothing blinks at the end of a stroke.
         if session.brushStroke == nil, let surface = strokeSurface {
@@ -667,14 +700,24 @@ final class CanvasView: NSView {
             self?.displayIfNeeded()
         }
         session.refreshViewportPreview = { [weak self] in
-            self?.synchronizeViewport()
+            guard let self else { return }
+            // Navigation must repaint the pixels, but never rebuild the whole layer hierarchy synchronously
+            // inside the mouse/trackpad event. Coalesce viewport bookkeeping to the next run-loop turn.
+            self.needsDisplay = true
+            self.refreshCanvasOverlays()
+            self.updateBrushCursor()
+            self.scheduleViewportSynchronization()
+        }
+        session.refreshCanvasOverlay = { [weak self] in
+            // Crop, marquee/lasso, guides and a moving selection live entirely in overlay layers.
+            // Marking the canvas itself dirty here would re-render the checkerboard and every layer per mouse event.
+            self?.refreshCanvasOverlays()
         }
         session.refreshCanvasInteraction = { [weak self] in
-            guard let self else { return }
-            _ = self.synchronizeDisplay()
-            self.needsDisplay = true
-            self.lines.needsDisplay = true
-            self.transformOverlay.needsDisplay = true
+            // Content previews (transform, gradient, shape, pixel move, brush) do need a full state sync,
+            // but event handlers already perform it when appropriate. This fallback is coalesced for
+            // programmatic changes so state mutation itself never performs an O(layer-count) walk.
+            self?.scheduleDisplaySynchronization()
         }
         addSubview(lines)
         addSubview(transformOverlay)
@@ -1910,7 +1953,6 @@ final class CanvasView: NSView {
             dragSelection(to: point, flags: event.modifierFlags)
             updateMarqueeAutoscroll(at: point)
             Self.moveSelectionCursor.set()
-            synchronizeDisplay()
             return
         }
         if session.tool.isSelectionTool, lastDragPoint == nil, let draft = session.lassoDraft, let document = session.document {
@@ -1922,7 +1964,6 @@ final class CanvasView: NSView {
                 dragMarqueeDraft(to: pixel, flags: event.modifierFlags)
                 updateMarqueeAutoscroll(at: point)
             }
-            synchronizeDisplay()
             return
         }
         if session.shapeDraft != nil, lastDragPoint == nil, let document = session.document {
@@ -1972,14 +2013,12 @@ final class CanvasView: NSView {
             dragCursor?.set()
             let pixel = session.viewport.documentPoint(from: point, documentSize: document.size)
             session.moveGuideDrag(to: Double(drag.axis == .vertical ? pixel.x : pixel.y))
-            synchronizeDisplay()
             dragCursor?.set()
             return
         }
         if let drag = cropDrag, session.tool == .crop, !session.isProjectBusy, let document = session.document {
             dragCursor?.set()
             dragCrop(drag, to: point, flags: event.modifierFlags, documentSize: document.size)
-            synchronizeDisplay()
             dragCursor?.set()
             return
         }
