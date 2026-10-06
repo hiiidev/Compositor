@@ -20,12 +20,14 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - runner: macos-15
+          - runner: macos-26
             arch: arm64
             xcode: "26.6"
+            swift_mode: wholemodule
           - runner: macos-15-intel
             arch: x86_64
             xcode: "26.3"
+            swift_mode: singlefile
     runs-on: ${{ matrix.runner }}
 
     steps:
@@ -56,6 +58,7 @@ jobs:
             -derivedDataPath "$RUNNER_TEMP/CompositorBuild" \
             ARCHS="${{ matrix.arch }}" \
             ONLY_ACTIVE_ARCH=YES \
+            SWIFT_COMPILATION_MODE="${{ matrix.swift_mode }}" \
             MACOSX_DEPLOYMENT_TARGET=14.0 \
             CODE_SIGN_STYLE=Manual \
             CODE_SIGN_IDENTITY="-" \
