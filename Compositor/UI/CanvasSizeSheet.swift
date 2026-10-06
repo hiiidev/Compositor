@@ -63,6 +63,16 @@ struct CanvasSizeSheet: View {
         return CanvasExtensionColor(red: rgb.redComponent, green: rgb.greenComponent, blue: rgb.blueComponent)
     }
 
+    private func dimensionRow(_ title: String, widthAxis: Bool) -> some View {
+        let value = dimension(widthAxis)
+        return HStack {
+            Text(title).frame(width: 60, alignment: .leading)
+                .scrubbable(sensitivity: scrubSensitivity(widthAxis), value: value,
+                            range: scrubRange(widthAxis), step: 1)
+            TextField(title, value: value, format: .number.precision(.fractionLength(0...3)))
+        }
+    }
+
     var body: some View { sheet.roundedControls() }
     @ViewBuilder private var sheet: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -74,19 +84,11 @@ struct CanvasSizeSheet: View {
             Picker("Units", selection: $draft.unit) {
                 ForEach(CanvasUnit.allCases, id: \.self) { Text($0.rawValue).tag($0) }
             }
-            HStack {
-                Text("Width").frame(width: 60, alignment: .leading)
-                    .scrubbable(sensitivity: scrubSensitivity(true), value: dimension(true), range: scrubRange(true), step: 1)
-                TextField("Width", value: dimension(true), format: .number.precision(.fractionLength(0...3)))
-            }
-            HStack {
-                Text("Height").frame(width: 60, alignment: .leading)
-                    .scrubbable(sensitivity: scrubSensitivity(false), value: dimension(false), range: scrubRange(false), step: 1)
-                TextField("Height", value: dimension(false), format: .number.precision(.fractionLength(0...3)))
-            }
+            dimensionRow("Width", widthAxis: true)
+            dimensionRow("Height", widthAxis: false)
             Toggle("Relative to current dimensions", isOn: $draft.relative)
             Toggle("Lock original aspect ratio", isOn: $draft.locked)
-                .onChange(of: draft.locked) { _, locked in
+                .onValueChangeCompat(of: draft.locked) { _, locked in
                     if locked { draft.set(draft.displayed(widthAxis: true), widthAxis: true) }
                 }
             if draft.valid {
@@ -99,9 +101,9 @@ struct CanvasSizeSheet: View {
             HStack(alignment: .top, spacing: 24) {
                 VStack(alignment: .leading, spacing: 8) {
                     Text("Anchor")
-                    Grid(horizontalSpacing: 3, verticalSpacing: 3) {
+                    VStack(spacing: 3) {
                         ForEach(0..<3) { row in
-                            GridRow {
+                            HStack(spacing: 3) {
                                 ForEach(0..<3) { column in
                                     let index = row * 3 + column
                                     Button { anchor = index } label: {
