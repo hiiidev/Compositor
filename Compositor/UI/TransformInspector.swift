@@ -2,6 +2,12 @@ import SwiftUI
 
 struct TransformInspector: View {
     @ObservedObject var session: EditorSession
+    @ObservedObject private var canvasInteraction: CanvasInteractionState
+
+    init(session: EditorSession) {
+        self.session = session
+        _canvasInteraction = ObservedObject(wrappedValue: session.canvasInteraction)
+    }
     private var value: LayerTransform {
         session.transformEdit?.draft ?? session.activeLayer.map { session.editedTransform(for: $0) }
             ?? LayerTransform(origin: .zero, size: CGSize(width: 1, height: 1))
