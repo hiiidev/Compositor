@@ -46,7 +46,7 @@ final class FloatingPanelController: NSObject, NSWindowDelegate {
         // Docked panels fill the window we size. An intrinsic SwiftUI height of zero (a scroll view
         // waiting for a proposed height) must not collapse the content.
         if placement == .dockedToMainWindowRight {
-            host.sizingOptions = []
+            if #available(macOS 13.0, *) { host.sizingOptions = [] }
             host.autoresizingMask = [.width, .height]
         }
         panel.contentView = host
