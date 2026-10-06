@@ -4,6 +4,12 @@ import SwiftUI
 /// every mouse move: read here, only this bar re-renders, not the whole editor and its Layers panel.
 struct CropControls: View {
     @ObservedObject var session: EditorSession
+    @ObservedObject private var canvasInteraction: CanvasInteractionState
+
+    init(session: EditorSession) {
+        self.session = session
+        _canvasInteraction = ObservedObject(wrappedValue: session.canvasInteraction)
+    }
 
     var body: some View {
         HStack(spacing: 14) {
