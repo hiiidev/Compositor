@@ -5,7 +5,13 @@ import Combine
 
 struct ProjectWorkspaceView: View {
     let applicationDelegate: CompositorApplicationDelegate
-    private var workspace: ProjectWorkspace { applicationDelegate.workspace }
+    @ObservedObject private var workspace: ProjectWorkspace
+
+    init(applicationDelegate: CompositorApplicationDelegate) {
+        self.applicationDelegate = applicationDelegate
+        _workspace = ObservedObject(wrappedValue: applicationDelegate.workspace)
+    }
+
     var body: some View {
         ContentView(session: workspace.current.session, applicationDelegate: applicationDelegate)
             .id(workspace.current.id)
@@ -48,7 +54,7 @@ private enum TabDragPhase {
 }
 
 struct ProjectTabStrip: View {
-    let workspace: ProjectWorkspace
+    @ObservedObject var workspace: ProjectWorkspace
     /// An external pasteboard drag (a file, or a layer from the panel) is in the air over the app.
     @State private var dragging = false
     @State private var dragChangeCount = NSPasteboard(name: .drag).changeCount
