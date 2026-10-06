@@ -43,7 +43,7 @@ struct BrushControls: View {
                 .frame(width: 48).textFieldStyle(.roundedBorder)
                 .arrowSteps(value: { Double(session.brushSettings.diameter) },
                             change: { session.brushSettings.diameter = CGFloat(min(2000, max(1, $0))) })
-                .onChange(of: session.brushSettings.diameter) { _, value in
+                .onValueChangeCompat(of: session.brushSettings.diameter) { _, value in
                     session.brushSettings.diameter = value.isFinite ? min(2000, max(1, value)) : 40
                 }
                 .unitSuffix("px")
