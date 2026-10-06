@@ -93,7 +93,7 @@ struct ProjectTabStrip: View {
             }
             .frame(height: 34, alignment: .leading)
             .onAppear { slotWidth = proxy.size.width }
-            .onChange(of: proxy.size.width) { _, new in slotWidth = new }
+            .onValueChangeCompat(of: proxy.size.width) { _, new in slotWidth = new }
         }
         .frame(height: 34)
     }
@@ -108,7 +108,7 @@ struct ProjectTabStrip: View {
             ForEach(layout.visible) { slot in tabView(for: slot, contentWidth: contentWidth) }
             if dragging {
                 NewTabDropSlot(workspace: workspace)
-                    .onGeometryChange(for: CGFloat.self) { $0.size.width } action: { dropSlotWidth = $0 }
+                    .onGeometryChangeCompat(for: CGFloat.self, of: { $0.size.width }, action: { dropSlotWidth = $0 })
                     .offset(x: layout.contentWidth + projectTabSpacing, y: 3)
             }
         }
