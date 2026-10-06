@@ -13,7 +13,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Black & White"
+            "value": "黑白"
           }
         }
       }
@@ -30,7 +30,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Color Balance"
+            "value": "色彩平衡"
           }
         }
       }
@@ -47,7 +47,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Invert"
+            "value": "反相"
           }
         }
       }
@@ -64,7 +64,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Exclusion"
+            "value": "排除"
           }
         }
       }
@@ -81,7 +81,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Hard Light"
+            "value": "强光"
           }
         }
       }
@@ -98,7 +98,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Hard Mix"
+            "value": "实色混合"
           }
         }
       }
@@ -115,7 +115,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Linear Burn"
+            "value": "线性加深"
           }
         }
       }
@@ -132,7 +132,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Linear Dodge (Add)"
+            "value": "线性减淡（添加）"
           }
         }
       }
@@ -149,7 +149,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Linear Light"
+            "value": "线性光"
           }
         }
       }
@@ -166,7 +166,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Pin Light"
+            "value": "点光"
           }
         }
       }
@@ -200,7 +200,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Divide"
+            "value": "划分"
           }
         }
       }
@@ -217,7 +217,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vivid Light"
+            "value": "亮光"
           }
         }
       }
@@ -234,7 +234,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Black & White"
+            "value": "黑白"
           }
         }
       }
@@ -251,7 +251,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Color Balance"
+            "value": "色彩平衡"
           }
         }
       }
@@ -619,7 +619,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Restart Compositor to apply the language change."
+            "value": "重新启动 Compositor 以应用语言更改。"
           }
         }
       }
@@ -635,7 +635,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "The image could not be read. It may be damaged or unavailable."
+            "value": "无法读取图像。文件可能已损坏或不可用。"
           }
         }
       }
@@ -651,7 +651,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Choose a JPEG, PNG, HEIC, or TIFF image."
+            "value": "请选择 JPEG、PNG、HEIC 或 TIFF 图像。"
           }
         }
       }
@@ -667,7 +667,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "This import exceeds the current 100-megapixel document budget or 30,000-pixel side limit."
+            "value": "此导入超出当前 1 亿像素的文档预算或 30,000 像素单边限制。"
           }
         }
       }
@@ -683,7 +683,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Image export supports canvases up to 100 megapixels and 30,000 pixels per side."
+            "value": "图像导出支持的画布上限为 1 亿像素，且单边不超过 30,000 像素。"
           }
         }
       }
@@ -699,7 +699,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "The canvas could not be rendered. Try a smaller canvas."
+            "value": "无法渲染画布。请尝试使用较小的画布。"
           }
         }
       }
@@ -715,7 +715,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "The image could not be encoded."
+            "value": "无法编码图像。"
           }
         }
       }
@@ -731,7 +731,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "This is not a valid Compositor project, or its metadata is damaged."
+            "value": "这不是有效的 Compositor 项目，或者项目元数据已损坏。"
           }
         }
       }
@@ -747,7 +747,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "This project uses format version %d. This app supports versions 1–8."
+            "value": "此项目使用格式版本 %d。本应用支持版本 1–8。"
           }
         }
       }
@@ -763,7 +763,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "An image inside the project is missing or damaged. The current document has not been replaced."
+            "value": "项目中的某个图像缺失或已损坏。当前文档未被替换。"
           }
         }
       }
@@ -779,7 +779,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "This project exceeds the supported canvas, layer, file-size, or 100-megapixel image limit."
+            "value": "此项目超出支持的画布、图层、文件大小或 1 亿像素图像限制。"
           }
         }
       }
@@ -795,7 +795,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "An image could not be saved. The previous project has not been replaced."
+            "value": "无法保存某个图像。原有项目未被替换。"
           }
         }
       }
@@ -811,7 +811,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "That selection is too detailed to outline. Try a different Tolerance, or turn on Contiguous."
+            "value": "该选区过于复杂，无法生成轮廓。请尝试调整“容差”，或开启“连续”。"
           }
         }
       }
@@ -827,7 +827,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "There isn’t enough memory to make that selection."
+            "value": "内存不足，无法创建该选区。"
           }
         }
       }
@@ -843,7 +843,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Object Selection requires macOS 14 or later."
+            "value": "对象选择需要 macOS 14 或更高版本。"
           }
         }
       }
@@ -859,7 +859,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "The object mask could not be rendered."
+            "value": "无法渲染对象蒙版。"
           }
         }
       }
@@ -875,7 +875,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "No foreground subject was detected in this layer. Try an image with a more distinct subject."
+            "value": "未在此图层中检测到前景主体。请尝试主体更清晰的图像。"
           }
         }
       }
@@ -891,7 +891,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Not enough unselected, opaque image pixels to synthesize a fill. Use a smaller selection with some surrounding image."
+            "value": "未选中的不透明图像像素不足，无法合成填充。请缩小选区，并保留一些周围图像。"
           }
         }
       }
@@ -923,7 +923,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Save Project As"
+            "value": "项目另存为"
           }
         }
       }
@@ -939,7 +939,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Save Project"
+            "value": "保存项目"
           }
         }
       }
@@ -955,7 +955,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Couldn’t export PNG"
+            "value": "无法导出 PNG"
           }
         }
       }
@@ -971,7 +971,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Couldn’t change canvas size"
+            "value": "无法更改画布大小"
           }
         }
       }
@@ -987,7 +987,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Couldn’t resize the image"
+            "value": "无法调整图像大小"
           }
         }
       }
@@ -1003,7 +1003,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Couldn’t export JPEG"
+            "value": "无法导出 JPEG"
           }
         }
       }
@@ -1019,7 +1019,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Couldn’t save the project"
+            "value": "无法保存项目"
           }
         }
       }
@@ -1035,7 +1035,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Couldn’t open the project"
+            "value": "无法打开项目"
           }
         }
       }
@@ -1051,7 +1051,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Untitled"
+            "value": "未命名"
           }
         }
       }
@@ -1067,7 +1067,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Don’t Save"
+            "value": "不保存"
           }
         }
       }
@@ -1083,7 +1083,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Save changes to %@?"
+            "value": "是否保存对 %@ 的更改？"
           }
         }
       }
@@ -1099,7 +1099,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Your changes will be lost if you don’t save them."
+            "value": "如果不保存，更改将会丢失。"
           }
         }
       }
@@ -1115,7 +1115,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Rename…"
+            "value": "重命名…"
           }
         }
       }
@@ -1131,7 +1131,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Hide/Show Layer"
+            "value": "隐藏/显示图层"
           }
         }
       }
@@ -1147,7 +1147,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Add White Mask"
+            "value": "添加白色蒙版"
           }
         }
       }
@@ -1163,7 +1163,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Add Black Mask"
+            "value": "添加黑色蒙版"
           }
         }
       }
@@ -1179,7 +1179,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Enable/Disable Mask"
+            "value": "启用/停用蒙版"
           }
         }
       }
@@ -1195,7 +1195,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Delete Mask"
+            "value": "删除蒙版"
           }
         }
       }
@@ -1211,7 +1211,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Release Clipping Mask"
+            "value": "释放剪贴蒙版"
           }
         }
       }
@@ -1227,7 +1227,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Delete Layer / Folder"
+            "value": "删除图层 / 文件夹"
           }
         }
       }
@@ -1243,7 +1243,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Linked"
+            "value": "已链接"
           }
         }
       }
@@ -1259,7 +1259,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Expand or collapse folder"
+            "value": "展开或折叠文件夹"
           }
         }
       }
@@ -1275,7 +1275,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Select layer; Cmd-click to select its pixels (Cmd-Shift adds, Cmd-Option subtracts)"
+            "value": "选择图层；按住 Command 点击可载入其像素选区（Command-Shift 添加，Command-Option 减去）"
           }
         }
       }
@@ -1291,7 +1291,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Link layer and mask so they move together"
+            "value": "链接图层与蒙版，使它们一起移动"
           }
         }
       }
@@ -1307,7 +1307,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Unlink layer and mask to move or transform them separately"
+            "value": "取消链接图层与蒙版，以便分别移动或变换"
           }
         }
       }
@@ -1323,7 +1323,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Link mask"
+            "value": "链接蒙版"
           }
         }
       }
@@ -1339,7 +1339,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Unlink mask"
+            "value": "取消链接蒙版"
           }
         }
       }
@@ -1403,7 +1403,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Select text"
+            "value": "选择文字"
           }
         }
       }
@@ -1419,7 +1419,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Select image"
+            "value": "选择图像"
           }
         }
       }
@@ -1435,7 +1435,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Select mask"
+            "value": "选择蒙版"
           }
         }
       }
@@ -1467,7 +1467,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Double-click to edit"
+            "value": "双击编辑"
           }
         }
       }
@@ -1515,7 +1515,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Clipped to"
+            "value": "剪贴到"
           }
         }
       }
@@ -1531,7 +1531,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Clipping mask based on %@. Option-click the bottom of its row to release."
+            "value": "基于 %@ 的剪贴蒙版。按住 Option 点击该行底部可释放。"
           }
         }
       }
@@ -1547,7 +1547,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Hide"
+            "value": "隐藏"
           }
         }
       }
@@ -1563,7 +1563,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "effect"
+            "value": "效果"
           }
         }
       }
@@ -1579,7 +1579,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Click to select; double-click to edit; Option-drag to copy"
+            "value": "点击选择；双击编辑；按住 Option 拖动可复制"
           }
         }
       }
@@ -1819,7 +1819,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Language"
+            "value": "语言"
           }
         }
       }
@@ -1835,7 +1835,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Settings…"
+            "value": "设置…"
           }
         }
       }
@@ -1851,7 +1851,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "System Default"
+            "value": "跟随系统"
           }
         }
       }
@@ -1979,7 +1979,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Blend"
+            "value": "混合"
           }
         }
       }
@@ -2283,7 +2283,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Outer Glow"
+            "value": "外发光"
           }
         }
       }
@@ -3499,7 +3499,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Add layer mask"
+            "value": "添加图层蒙版"
           }
         }
       }
@@ -3547,7 +3547,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Canvas"
+            "value": "画布"
           }
         }
       }
@@ -3595,7 +3595,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Font"
+            "value": "字体"
           }
         }
       }
@@ -3691,7 +3691,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "New blank layer"
+            "value": "新建空白图层"
           }
         }
       }
@@ -3963,7 +3963,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Color + neutral midtones"
+            "value": "颜色 + 中性中间调"
           }
         }
       }
@@ -4027,7 +4027,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Contrast"
+            "value": "对比度"
           }
         }
       }
@@ -4123,7 +4123,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Edit"
+            "value": "编辑"
           }
         }
       }
@@ -4219,7 +4219,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Floating Selection"
+            "value": "浮动选区"
           }
         }
       }
@@ -4331,7 +4331,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Gray"
+            "value": "灰色"
           }
         }
       }
@@ -4411,7 +4411,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Layer Effects"
+            "value": "图层效果"
           }
         }
       }
@@ -5003,7 +5003,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Analyze the active layer only, or every visible layer as shown"
+            "value": "仅分析当前图层，或分析画面中显示的所有可见图层"
           }
         }
       }
@@ -5067,7 +5067,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Background for transparency"
+            "value": "透明区域的背景"
           }
         }
       }
@@ -5115,7 +5115,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Canvas text"
+            "value": "画布文字"
           }
         }
       }
@@ -5403,7 +5403,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Fade the edge of the selection by this many pixels"
+            "value": "按此像素数柔化选区边缘"
           }
         }
       }
@@ -5499,7 +5499,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Final dimensions must be 1–30,000 pixels per side."
+            "value": "最终尺寸每边必须为 1–30,000 像素。"
           }
         }
       }
@@ -5643,7 +5643,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Group selected layers (⌘G)"
+            "value": "将所选图层编组（⌘G）"
           }
         }
       }
@@ -5739,7 +5739,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Linear histogram with automatic vertical scaling. Tall spikes may extend beyond the graph; all tones from 0 to 255 remain included."
+            "value": "线性直方图会自动缩放纵轴。过高的峰值可能超出图表范围，但仍会包含 0 到 255 的全部色调。"
           }
         }
       }
@@ -5803,7 +5803,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Match the clicked pixel, or the average of the pixels around it"
+            "value": "匹配点击的像素，或匹配其周围像素的平均值"
           }
         }
       }
@@ -6043,7 +6043,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Positive straightens lines that bow outward (barrel); negative, lines that bow inward (pincushion)."
+            "value": "正值校正向外弯曲的线条（桶形畸变）；负值校正向内弯曲的线条（枕形畸变）。"
           }
         }
       }
@@ -6059,7 +6059,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Positive values tighten the detected mask inward; negative values expand it outward"
+            "value": "正值向内收紧检测到的蒙版；负值向外扩展"
           }
         }
       }
@@ -6075,7 +6075,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Press L to switch between Freehand and Polygonal"
+            "value": "按 L 在自由套索与多边形套索之间切换"
           }
         }
       }
@@ -6091,7 +6091,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Press M to switch between Rectangle and Ellipse"
+            "value": "按 M 在矩形与椭圆之间切换"
           }
         }
       }
@@ -6107,7 +6107,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Press Tab to switch between Wand and Object"
+            "value": "按 Tab 在魔棒与对象选择之间切换"
           }
         }
       }
@@ -6171,7 +6171,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Read colors from the active layer only, or from every visible layer as shown"
+            "value": "仅从当前图层读取颜色，或从画面中显示的所有可见图层读取"
           }
         }
       }
@@ -6411,7 +6411,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Select only similar pixels connected to the one you click; off selects them everywhere"
+            "value": "仅选择与点击像素相连的相似像素；关闭后会选择图像中所有相似像素"
           }
         }
       }
@@ -6635,7 +6635,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "How far each color channel (0–255) can differ from the clicked color and still be selected"
+            "value": "每个颜色通道（0–255）与点击颜色允许相差多少仍可被选中"
           }
         }
       }
@@ -6651,7 +6651,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Hold Shift to add or Option to subtract for one outline"
+            "value": "按住 Shift 添加到选区，按住 Option 从选区减去"
           }
         }
       }
@@ -6987,7 +6987,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Text fields keep standard macOS editing keys. Dialogs share the Apply/Cancel assignments above. Numeric fields use Up/Down, with Shift for larger steps. Standard macOS commands include ⌘Q to quit and ⌃⌘F for full screen. The shortcut editor itself always uses Return to save and Esc to cancel when not recording."
+            "value": "文本字段保留标准 macOS 编辑快捷键。对话框使用上方相同的“应用/取消”快捷键。数值字段可用上/下方向键调整，按住 Shift 可增大步长。标准 macOS 命令包括 ⌘Q 退出和 ⌃⌘F 全屏。快捷键编辑器在未录制快捷键时始终使用 Return 保存、Esc 取消。"
           }
         }
       }
@@ -7035,7 +7035,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Selection"
+            "value": "选区"
           }
         }
       }
@@ -7051,7 +7051,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Type (T)"
+            "value": "文字 (T)"
           }
         }
       }
@@ -7067,7 +7067,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Eyedropper (I)"
+            "value": "吸管 (I)"
           }
         }
       }
@@ -7083,7 +7083,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Marquee (M)"
+            "value": "选框 (M)"
           }
         }
       }
@@ -7099,7 +7099,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Lasso (L)"
+            "value": "套索 (L)"
           }
         }
       }
@@ -7115,7 +7115,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Magic (W) · Tab switches Wand and Object"
+            "value": "魔棒 (W) · Tab 切换魔棒与对象选择"
           }
         }
       }
@@ -7131,7 +7131,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Brush (B) · Eraser (E)"
+            "value": "画笔 (B) · 橡皮擦 (E)"
           }
         }
       }
@@ -7147,7 +7147,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Spot Healing Brush (J)"
+            "value": "污点修复画笔 (J)"
           }
         }
       }
@@ -7163,7 +7163,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Clone Stamp (S) · Option-click sets the source"
+            "value": "仿制图章 (S) · Option-点击设置源点"
           }
         }
       }
@@ -7179,7 +7179,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Smear (R)"
+            "value": "涂抹 (R)"
           }
         }
       }
@@ -7195,7 +7195,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Gradient (G)"
+            "value": "渐变 (G)"
           }
         }
       }
@@ -7211,7 +7211,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Shape (U) · Shift-U switches Rectangle/Ellipse"
+            "value": "形状 (U) · Shift-U 切换矩形/椭圆"
           }
         }
       }
@@ -7227,7 +7227,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Crop (C)"
+            "value": "裁剪 (C)"
           }
         }
       }
@@ -7243,7 +7243,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Move / Transform (V)"
+            "value": "移动 / 变换 (V)"
           }
         }
       }
@@ -7259,7 +7259,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Hand (H)"
+            "value": "抓手 (H)"
           }
         }
       }
@@ -7275,7 +7275,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Zoom (Z)"
+            "value": "缩放 (Z)"
           }
         }
       }
