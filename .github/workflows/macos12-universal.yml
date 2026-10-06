@@ -1,0 +1,85 @@
+name: macOS 12+ Universal Compatibility
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - macos12-universal
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build ${{ matrix.arch }} for macOS 12+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: macos-15
+            arch: arm64
+          - runner: macos-15-intel
+            arch: x86_64
+    runs-on: ${{ matrix.runner }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Select Xcode 26.3
+        run: |
+          sudo xcode-select -s /Applications/Xcode_26.3.app/Contents/Developer
+          xcodebuild -version
+          sw_vers
+          uname -m
+
+      - name: Resolve packages
+        run: |
+          xcodebuild -resolvePackageDependencies \
+            -project Compositor.xcodeproj \
+            -scheme Compositor \
+            -onlyUsePackageVersionsFromResolvedFile
+
+      - name: Build Release
+        run: |
+          xcodebuild \
+            -project Compositor.xcodeproj \
+            -scheme Compositor \
+            -configuration Release \
+            -destination "platform=macOS,arch=${{ matrix.arch }}" \
+            -derivedDataPath "$RUNNER_TEMP/CompositorBuild" \
+            ARCHS="${{ matrix.arch }}" \
+            ONLY_ACTIVE_ARCH=YES \
+            MACOSX_DEPLOYMENT_TARGET=12.0 \
+            CODE_SIGN_STYLE=Manual \
+            CODE_SIGN_IDENTITY="-" \
+            DEVELOPMENT_TEAM="" \
+            ENABLE_HARDENED_RUNTIME=NO
+
+      - name: Verify binary
+        run: |
+          APP="$RUNNER_TEMP/CompositorBuild/Build/Products/Release/Compositor.app"
+          test -d "$APP"
+          codesign --verify --deep --strict "$APP"
+          file "$APP/Contents/MacOS/Compositor"
+          echo "Minimum macOS:"
+          defaults read "$APP/Contents/Info" LSMinimumSystemVersion
+          echo "Mach-O build version:"
+          xcrun vtool -show-build "$APP/Contents/MacOS/Compositor"
+
+      - name: Package
+        run: |
+          cd "$RUNNER_TEMP/CompositorBuild/Build/Products/Release"
+          ditto -c -k --sequesterRsrc --keepParent \
+            Compositor.app \
+            "$GITHUB_WORKSPACE/Compositor-macOS12-${{ matrix.arch }}.zip"
+
+      - name: Upload
+        uses: actions/upload-artifact@v7
+        with:
+          name: Compositor-macOS12-${{ matrix.arch }}
+          path: Compositor-macOS12-${{ matrix.arch }}.zip
+          retention-days: 14
