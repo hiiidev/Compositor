@@ -2,6 +2,12 @@ import SwiftUI
 
 struct LassoControls: View {
     @ObservedObject var session: EditorSession
+    @ObservedObject private var canvasInteraction: CanvasInteractionState
+
+    init(session: EditorSession) {
+        self.session = session
+        _canvasInteraction = ObservedObject(wrappedValue: session.canvasInteraction)
+    }
 
     var body: some View {
         HStack(spacing: 12) {
