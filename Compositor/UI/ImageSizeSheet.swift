@@ -127,7 +127,7 @@ struct ImageSizeSheet: View {
             HStack {
                 Text("Resolution").scrubbable(sensitivity: 1, value: $resolution, range: 1...9600, step: 1)
                 TextField("Resolution", value: $resolution, format: .number.precision(.fractionLength(0...3)))
-                    .onChange(of: resolution) { _, new in
+                    .onValueChangeCompat(of: resolution) { _, new in
                         guard new.isFinite, new > 0 else { return }
                         if resample, unit == "Inches" || unit == "Centimeters" {
                             width *= new / lastResolution
@@ -137,7 +137,7 @@ struct ImageSizeSheet: View {
                     }
                 Text("pixels/inch").foregroundStyle(.secondary)
             }
-            Toggle("Resample", isOn: $resample).onChange(of: resample) { _, enabled in
+            Toggle("Resample", isOn: $resample).onValueChangeCompat(of: resample) { _, enabled in
                 if !enabled {
                     width = Double(document.width)
                     height = Double(document.height)
