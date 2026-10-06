@@ -146,10 +146,8 @@ jobs:
 
           ### Downloads
 
-          **English**
           `$PACKAGE.zip`
 
-          **简体中文（含 English）**
           `$PACKAGE-zh-Hans.zip`
 
           Both packages are **Universal 2** and contain **arm64 + x86_64**. Minimum deployment target: **macOS 12.0 Monterey**.
@@ -175,4 +173,4 @@ jobs:
           `xattr -cr /Applications/Compositor.app`
           EOF
 
-          gh release create "$TAG"             "$PACKAGE.zip#English"             "$PACKAGE-zh-Hans.zip#简体中文（含 English）"             --target "$GITHUB_SHA"             --title "Compositor $VERSION — macOS Universal RC 2"             --notes-file "$RUNNER_TEMP/release-notes.md"             --prerelease
+          gh release create "$TAG"             "$PACKAGE.zip"             "$PACKAGE-zh-Hans.zip"             --target "$GITHUB_SHA"             --title "Compositor $VERSION — macOS Universal RC 2"             --notes-file "$RUNNER_TEMP/release-notes.md"             --prerelease
