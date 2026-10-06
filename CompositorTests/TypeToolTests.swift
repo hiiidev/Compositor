@@ -204,13 +204,13 @@ struct TypeToolTests {
         window.contentView = bridge
         window.makeKeyAndOrderFront(nil)
         defer { window.orderOut(nil) }
-        try await Task.sleep(for: .milliseconds(50))
+        try await Task.sleep(nanoseconds: LegacyDelay.milliseconds(50))
 
         window.standardWindowButton(.closeButton)?.performClick(nil)
         var alertWindow: NSWindow?
         for _ in 0..<20 where alertWindow == nil {
             alertWindow = window.attachedSheet
-            if alertWindow == nil { try await Task.sleep(for: .milliseconds(10)) }
+            if alertWindow == nil { try await Task.sleep(nanoseconds: LegacyDelay.milliseconds(10)) }
         }
         let sheet = try #require(alertWindow)
         func button(in view: NSView) -> NSButton? {
@@ -223,7 +223,7 @@ struct TypeToolTests {
         let contentView = try #require(sheet.contentView)
         let discard = try #require(button(in: contentView))
         discard.performClick(nil)
-        try await Task.sleep(for: .milliseconds(50))
+        try await Task.sleep(nanoseconds: LegacyDelay.milliseconds(50))
 
         #expect(!window.isVisible)
         #expect(session.textDraft == nil)
@@ -242,7 +242,7 @@ struct TypeToolTests {
         window.contentView = bridge
         window.makeKeyAndOrderFront(nil)
         defer { window.orderOut(nil) }
-        try await Task.sleep(for: .milliseconds(50))
+        try await Task.sleep(nanoseconds: LegacyDelay.milliseconds(50))
 
         delegate.workspace.window = window
         delegate.projects.window = window
@@ -250,7 +250,7 @@ struct TypeToolTests {
         var alertWindow: NSWindow?
         for _ in 0..<20 where alertWindow == nil {
             alertWindow = window.attachedSheet
-            if alertWindow == nil { try await Task.sleep(for: .milliseconds(10)) }
+            if alertWindow == nil { try await Task.sleep(nanoseconds: LegacyDelay.milliseconds(10)) }
         }
         let sheet = try #require(alertWindow)
         func button(in view: NSView) -> NSButton? {
