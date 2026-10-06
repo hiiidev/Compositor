@@ -86,10 +86,6 @@ struct CameraRawSlider: NSViewRepresentable {
         return slider
     }
 
-    func sizeThatFits(_ proposal: ProposedViewSize, nsView: CameraRawSliderView, context: Context) -> CGSize? {
-        CGSize(width: proposal.width ?? 120, height: 22)
-    }
-
     func updateNSView(_ slider: CameraRawSliderView, context: Context) {
         context.coordinator.onChange = onChange
         context.coordinator.onReset = onReset
@@ -119,6 +115,13 @@ struct CameraRawSlider: NSViewRepresentable {
         }
         func reset() { onReset() }
         @objc func changed(_ sender: NSSlider) { onChange(sender.doubleValue) }
+    }
+}
+
+@available(macOS 13.0, *)
+extension CameraRawSlider {
+    func sizeThatFits(_ proposal: ProposedViewSize, nsView: CameraRawSliderView, context: Context) -> CGSize? {
+        CGSize(width: proposal.width ?? 120, height: 22)
     }
 }
 

@@ -137,10 +137,10 @@ nonisolated struct FilterJob: @unchecked Sendable {
     /// Canvas-space origin used by live adjustment layers so partial redraws keep one noise field.
     var noiseOrigin: CGPoint = .zero
     /// Camera Raw's Option-drag clipping view. Preview only; committing leaves this nil.
-    @Published var cameraRawClipping: CameraRawClipping? = nil
+    var cameraRawClipping: CameraRawClipping? = nil
     /// Persistent histogram clipping indicators. Preview only; committing leaves these off.
-    @Published var showsShadowClipping = false
-    @Published var showsHighlightClipping = false
+    var showsShadowClipping = false
+    var showsHighlightClipping = false
     /// Point-color range preview. −1 leaves the grade alone.
     var visualizesPointColor = -1
     /// Option-drag on Sharpening Masking. Preview only.
