@@ -168,7 +168,7 @@ final class ProjectWorkspace: ObservableObject {
         defer { for (url, scoped) in files where scoped { url.stopAccessingSecurityScopedResource() } }
         while !canSwitch {
             if Task.isCancelled { return }
-            try? await Task.sleep(for: .milliseconds(30))
+            try? await Task.sleep(nanoseconds: LegacyDelay.milliseconds(30))
         }
         isManaging = true; defer { isManaging = false }
         for url in urls {

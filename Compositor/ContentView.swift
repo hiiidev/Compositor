@@ -371,7 +371,14 @@ private struct PanelResizeEdge: View {
 extension View {
     /// Bordered buttons and pop-up menus drawn as capsules throughout the app. Borderless and plain buttons (the tool
     /// rail, the Layers panel footer) have no border to shape, so they're unaffected.
-    func roundedControls() -> some View { buttonBorderShape(.capsule) }
+    @ViewBuilder
+    func roundedControls() -> some View {
+        if #available(macOS 14.0, *) {
+            buttonBorderShape(.capsule)
+        } else {
+            self
+        }
+    }
 }
 
 extension View {

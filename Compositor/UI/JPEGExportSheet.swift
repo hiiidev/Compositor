@@ -100,7 +100,7 @@ struct JPEGExportSheet: View {
             let requested = options
             error = nil
             do {
-                try await Task.sleep(for: .milliseconds(200))
+                try await Task.sleep(nanoseconds: LegacyDelay.milliseconds(200))
                 let encoded = try await ImageExporter.shared.jpeg(raster, options: requested)
                 try Task.checkCancellation()
                 result = encoded

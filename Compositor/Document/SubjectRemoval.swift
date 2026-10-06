@@ -27,7 +27,8 @@ nonisolated enum SubjectRemoval {
     /// Vision's raw subject mask, white over the subject: the model has no settings of its own, so everything the
     /// panel offers is done to this afterwards by `refined`.
     private static func vision(_ image: CGImage) throws -> CGImage {
-        try cache.mask(for: image) {
+        guard #available(macOS 14.0, *) else { throw Failure.noSubject }
+        return try cache.mask(for: image) {
             let handler = VNImageRequestHandler(cgImage: image, orientation: .up)
             let request = VNGenerateForegroundInstanceMaskRequest()
             try handler.perform([request])

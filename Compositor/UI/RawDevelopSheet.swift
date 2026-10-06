@@ -53,7 +53,7 @@ struct RawDevelopSheet: View {
     private func refreshPreview() async {
         // Just enough to coalesce a burst of slider changes; the render itself is nearly free once
         // the file's filter is warm (see RawImporter.Queue).
-        if revision > 0 { try? await Task.sleep(for: .milliseconds(60)) }
+        if revision > 0 { try? await Task.sleep(nanoseconds: LegacyDelay.milliseconds(60)) }
         guard !Task.isCancelled else { return }
         working = true
         defer { working = false }
