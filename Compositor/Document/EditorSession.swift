@@ -110,7 +110,8 @@ final class EditorSession: ObservableObject {
     var refreshCanvasInteraction: (() -> Void)?
     var refreshViewportPreview: (() -> Void)?
 
-    private func canvasInteractionChanged() {
+    private func canvasInteractionChanged(publishGlobal: Bool = false) {
+        if publishGlobal { objectWillChange.send() }
         canvasInteraction.invalidate()
         refreshCanvasInteraction?()
     }
@@ -190,10 +191,17 @@ final class EditorSession: ObservableObject {
     var viewport = CanvasViewport() { didSet { if oldValue != viewport { viewportChanged() } } }
     @Published var tool: NavigationTool = .move
     @Published var collapsedGroupIDs: Set<UUID> = []
-    var cropRect: CGRect? { didSet { if oldValue != cropRect { canvasInteractionChanged() } } }
+    var cropRect: CGRect? {
+        didSet {
+            guard oldValue != cropRect else { return }
+            canvasInteractionChanged(publishGlobal: (oldValue == nil) != (cropRect == nil))
+        }
+    }
     @Published var cropRatioChoice = "Free"
     @Published var cropError: String?
-    var transformEdit: TransformEdit? { didSet { canvasInteractionChanged() } }
+    var transformEdit: TransformEdit? {
+        didSet { canvasInteractionChanged(publishGlobal: (oldValue == nil) != (transformEdit == nil)) }
+    }
     var distortPreviewCache: [UUID: DistortPreviewCache] = [:]
     var distortEffectsCache: [UUID: DistortEffectsCache] = [:]
     /// Document positions a move has just snapped to, drawn as guides while it lasts.
@@ -246,7 +254,9 @@ final class EditorSession: ObservableObject {
     @Published var maskPaintWhite = false { didSet { refreshGradient() } }
     @Published var backgroundColor = PaletteColor.white { didSet { refreshGradient() } }
     @Published var gradientSettings = GradientSettings() { didSet { refreshGradient() } }
-    var gradientEdit: GradientEdit? { didSet { canvasInteractionChanged() } }
+    var gradientEdit: GradientEdit? {
+        didSet { canvasInteractionChanged(publishGlobal: (oldValue == nil) != (gradientEdit == nil)) }
+    }
     var lassoDraft: LassoDraft? { didSet { canvasInteractionChanged() } }
     @Published var lassoKind = LassoKind.freehand
     @Published var marqueeKind = LassoKind.rectangle
@@ -264,7 +274,9 @@ final class EditorSession: ObservableObject {
     @Published var heldSelectionMode: SelectionMode?
     /// The selection as it was when a drag-move began; the drag is one undo step.
     var selectionMoveOrigin: DocumentSelection?
-    var pixelMove: PixelMove? { didSet { canvasInteractionChanged() } }
+    var pixelMove: PixelMove? {
+        didSet { canvasInteractionChanged(publishGlobal: (oldValue == nil) != (pixelMove == nil)) }
+    }
     var pixelClipboard: PixelClipboard?
     var copiedLayer: CopiedLayer?
     @Published var levels: LevelsEdit? { didSet { resumeFileRequests() } }
