@@ -10,8 +10,8 @@ permissions:
   contents: read
 
 concurrency:
-  group: macos14-universal-${{ github.ref }}
-  cancel-in-progress: true
+  group: macos14-universal-${{ github.sha }}
+  cancel-in-progress: false
 
 jobs:
   build:
