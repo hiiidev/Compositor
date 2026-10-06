@@ -45,7 +45,7 @@ struct TransformInspector: View {
             // Numbers describe an ordinary transform; while distorted, the handles are the controls.
             }.disabled((!session.canTransform && session.transformEdit == nil) || session.transformEdit?.corners != nil)
                 .padding(.horizontal, 18)
-          }.scrollIndicators(.hidden)
+          }.legacyScrollIndicatorsHidden()
           // Only an edit that waits for them — typed values, ⌘T, a distortion — has anything to cancel or apply. A
           // handle drag applies itself on release, and ghosted buttons after it read as the pixels being resampled,
           // which they never are. Left in place unseen, so Escape and Return still reach a drag in progress.
@@ -122,9 +122,9 @@ private struct TransformValueField: View {
                 .textFieldStyle(.roundedBorder).focused($focused)
                 .accessibilityIdentifier("transform\(label)")
                 .onAppear { sync() }
-                .onChange(of: value) { if !focused { sync() } }
-                .onChange(of: focused) { if !focused { finish(); sync() } }
-                .onChange(of: text) {
+                .onValueChangeCompat(of: value) { _, _ in if !focused { sync() } }
+                .onValueChangeCompat(of: focused) { _, _ in if !focused { finish(); sync() } }
+                .onValueChangeCompat(of: text) { _, _ in
                     if focused, let number = Double(text), number.isFinite { change(CGFloat(number)) }
                 }
                 // The field holds off syncing while it has focus, so as not to fight what is being typed; a step
