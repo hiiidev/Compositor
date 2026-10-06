@@ -116,10 +116,10 @@ struct GridSettingsSheet: View {
             }
         }
         .textFieldStyle(.roundedBorder).padding(24).frame(width: 360)
-        .onChange(of: appearance) { preview(grid, appearance) }
+        .onValueChangeCompat(of: appearance) { _, _ in preview(grid, appearance) }
         // Choosing a preset from the menu ends a pick that started from another.
-        .onChange(of: appearance.preset) { _, preset in if preset != .custom { pickedFrom = nil } }
-        .onChange(of: spacing) { if valid { preview(grid, appearance) } }
-        .onChange(of: subdivisions) { if valid { preview(grid, appearance) } }
+        .onValueChangeCompat(of: appearance.preset) { _, preset in if preset != .custom { pickedFrom = nil } }
+        .onValueChangeCompat(of: spacing) { _, _ in if valid { preview(grid, appearance) } }
+        .onValueChangeCompat(of: subdivisions) { _, _ in if valid { preview(grid, appearance) } }
     }
 }
