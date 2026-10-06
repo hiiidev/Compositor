@@ -38,17 +38,3 @@ extension View {
         else { self }
     }
 }
-
-
-extension Scene {
-    @SceneBuilder
-    func macOS14DefaultWindowPlacement() -> some Scene {
-        if #available(macOS 15.0, *) {
-            defaultWindowPlacement { _, context in
-                WindowPlacement(size: context.defaultDisplay.visibleRect.size)
-            }
-        } else {
-            self
-        }
-    }
-}
