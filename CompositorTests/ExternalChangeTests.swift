@@ -46,16 +46,16 @@ struct ExternalChangeTests {
         try await ProjectStore.shared.save(snapshot, to: url)
     }
 
-    private func eventually(_ timeout: Duration = .seconds(4), _ condition: () -> Bool) async -> Bool {
-        let deadline = ContinuousClock.now + timeout
-        while ContinuousClock.now < deadline {
+    private func eventually(_ timeout: TimeInterval = 4, _ condition: () -> Bool) async -> Bool {
+        let deadline = Date().addingTimeInterval(timeout)
+        while Date() < deadline {
             if condition() { return true }
-            try? await Task.sleep(for: .milliseconds(50))
+            try? await Task.sleep(nanoseconds: 50_000_000)
         }
         return condition()
     }
 
-    private func settle() async { try? await Task.sleep(for: .milliseconds(900)) }
+    private func settle() async { try? await Task.sleep(nanoseconds: 900_000_000) }
 
     @Test func digestFollowsContentNotMetadata() async throws {
         let root = try temporaryFolder()
