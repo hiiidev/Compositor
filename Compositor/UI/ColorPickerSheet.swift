@@ -45,8 +45,8 @@ struct ColorPickerSheet: View {
         .padding(20)
         .fixedSize()
         .onAppear { hexDraft = color.hex }
-        .onChange(of: color) { _, new in if !hexFocused { hexDraft = new.hex } }
-        .onChange(of: hexFocused) { _, focused in if !focused { commitHex() } }
+        .onValueChangeCompat(of: color) { _, new in if !hexFocused { hexDraft = new.hex } }
+        .onValueChangeCompat(of: hexFocused) { _, focused in if !focused { commitHex() } }
     }
 
     private var saturationBrightnessField: some View {
@@ -105,11 +105,11 @@ struct ColorPickerSheet: View {
     }
 
     private var fields: some View {
-        Grid(alignment: .leading, horizontalSpacing: 8, verticalSpacing: 6) {
+        VStack(alignment: .leading, spacing: 6) {
             channelRow("R", \.red)
             channelRow("G", \.green)
             channelRow("B", \.blue)
-            GridRow {
+            HStack(spacing: 8) {
                 Text("#").frame(width: 14, alignment: .leading)
                 TextField("Hex", text: $hexDraft)
                     .font(.system(.body, design: .monospaced))
@@ -129,7 +129,7 @@ struct ColorPickerSheet: View {
                 rgb[keyPath: channel] = CGFloat(min(255, max(0, newValue))) / 255
                 hsb.setRGB(rgb)
             })
-        return GridRow {
+        return HStack(spacing: 8) {
             Text(label).frame(width: 14, alignment: .leading)
                 .scrubbable(sensitivity: 1, value: channelValue, range: 0...255)
             TextField(label, value: channelValue, format: .number)
@@ -208,7 +208,7 @@ struct DialogColorSwatch: View {
         }
         .buttonStyle(.plain)
         .accessibilityLabel(title)
-        .onChange(of: session.colorPicker?.color) { _, _ in session.previewDialogColor() }
+        .onValueChangeCompat(of: session.colorPicker?.color) { _, _ in session.previewDialogColor() }
         .onDisappear { Self.closePicker(session) }
     }
     static func closePicker(_ session: EditorSession) {
