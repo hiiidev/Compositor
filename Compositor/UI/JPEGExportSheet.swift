@@ -135,26 +135,45 @@ struct JPEGPreview: View {
     let pixelHeight: Int
     @Binding var zoom: Double?
     @Environment(\.displayScale) private var displayScale
-    @State private var position = ScrollPosition()
-    @State private var offset = CGPoint.zero
-    @State private var dragStart: CGPoint?
 
     /// The zoom at which the whole image fits `frame`.
     static func fitZoom(width: Int, height: Int, in frame: CGSize, displayScale: CGFloat) -> Double {
         let points = CGSize(width: CGFloat(width) / max(1, displayScale), height: CGFloat(height) / max(1, displayScale))
         return Double(min(frame.width / points.width, frame.height / points.height))
     }
+
     /// The next zoom step past `zoom` in `direction` (1 in, −1 out), or nil at the end.
     static func step(from zoom: Double, in direction: Int) -> Double? {
         direction > 0 ? steps.first { $0 > zoom * 1.001 } : steps.last { $0 < zoom * 0.999 }
     }
+
+    @ViewBuilder
+    var body: some View {
+        if #available(macOS 15.0, *) {
+            ModernJPEGPreview(image: image, pixelWidth: pixelWidth, pixelHeight: pixelHeight, zoom: $zoom)
+        } else {
+            LegacyJPEGPreview(image: image, pixelWidth: pixelWidth, pixelHeight: pixelHeight,
+                              zoom: $zoom, displayScale: displayScale)
+        }
+    }
+}
+
+@available(macOS 15.0, *)
+private struct ModernJPEGPreview: View {
+    let image: CGImage
+    let pixelWidth: Int
+    let pixelHeight: Int
+    @Binding var zoom: Double?
+    @Environment(\.displayScale) private var displayScale
+    @State private var position = ScrollPosition()
+    @State private var offset = CGPoint.zero
+    @State private var dragStart: CGPoint?
 
     var body: some View {
         GeometryReader { geometry in
             if let zoom {
                 let size = shownSize(zoom)
                 ScrollView([.horizontal, .vertical]) {
-                    // Nearest-neighbor from 100% up, so each pixel of the JPEG and its artifacts shows as it is.
                     Image(decorative: image, scale: 1).resizable().interpolation(zoom >= 1 ? .none : .high)
                         .frame(width: size.width, height: size.height)
                         .frame(minWidth: geometry.size.width, minHeight: geometry.size.height)
@@ -182,12 +201,11 @@ struct JPEGPreview: View {
         }
     }
 
-    /// The image's size on screen at `zoom`, in points.
     private func shownSize(_ zoom: Double) -> CGSize {
-        CGSize(width: CGFloat(pixelWidth) / max(1, displayScale) * zoom, height: CGFloat(pixelHeight) / max(1, displayScale) * zoom)
+        CGSize(width: CGFloat(pixelWidth) / max(1, displayScale) * zoom,
+               height: CGFloat(pixelHeight) / max(1, displayScale) * zoom)
     }
 
-    /// Zooming keeps the middle of the view on the same part of the image; coming from Fit, it starts at the center.
     private func keepCentered(from old: Double?, to new: Double?, in view: CGSize) {
         guard let new else { return }
         let size = shownSize(new)
@@ -198,7 +216,38 @@ struct JPEGPreview: View {
             let fy = before.height > 0 ? (offset.y + min(view.height, before.height) / 2) / before.height : 0.5
             middle = CGPoint(x: fx * size.width, y: fy * size.height)
         }
-        position.scrollTo(point: CGPoint(x: min(max(0, middle.x - view.width / 2), max(0, size.width - view.width)),
-                                         y: min(max(0, middle.y - view.height / 2), max(0, size.height - view.height))))
+        position.scrollTo(point: CGPoint(
+            x: min(max(0, middle.x - view.width / 2), max(0, size.width - view.width)),
+            y: min(max(0, middle.y - view.height / 2), max(0, size.height - view.height))
+        ))
+    }
+}
+
+/// macOS 14 fallback. The core export preview still supports Fit, 100%, zoom steps and scrolling.
+private struct LegacyJPEGPreview: View {
+    let image: CGImage
+    let pixelWidth: Int
+    let pixelHeight: Int
+    @Binding var zoom: Double?
+    let displayScale: CGFloat
+
+    var body: some View {
+        GeometryReader { geometry in
+            if let zoom {
+                let size = CGSize(width: CGFloat(pixelWidth) / max(1, displayScale) * zoom,
+                                  height: CGFloat(pixelHeight) / max(1, displayScale) * zoom)
+                ScrollView([.horizontal, .vertical], showsIndicators: true) {
+                    Image(decorative: image, scale: 1).resizable().interpolation(zoom >= 1 ? .none : .high)
+                        .frame(width: size.width, height: size.height)
+                        .frame(minWidth: geometry.size.width, minHeight: geometry.size.height)
+                }
+                .onTapGesture(count: 2) { self.zoom = nil }
+            } else {
+                Image(decorative: image, scale: 1).resizable().interpolation(.high).scaledToFit()
+                    .frame(width: geometry.size.width, height: geometry.size.height)
+                    .contentShape(Rectangle())
+                    .onTapGesture(count: 2) { self.zoom = 1 }
+            }
+        }
     }
 }
