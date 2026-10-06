@@ -100,7 +100,26 @@ enum NavigationTool: String, CaseIterable {
     var label: String { self == .type ? "Type (T)" : self == .eyedropper ? "Eyedropper (I)" : self == .marquee ? "Marquee (M)" : self == .lasso ? "Lasso (L)" : self == .wand ? "Magic (W) · Tab switches Wand and Object" : self == .brush ? "Brush (B) · Eraser (E)" : self == .spotHealing ? "Spot Healing Brush (J)" : self == .cloneStamp ? "Clone Stamp (S) · Option-click sets the source" : self == .blur ? "Smear (R)" : self == .gradient ? "Gradient (G)" : self == .shape ? "Shape (U) · Shift-U switches Rectangle/Ellipse" : self == .crop ? "Crop (C)" : self == .move ? "Move / Transform (V)" : self == .hand ? "Hand (H)" : "Zoom (Z)" }
 }
 
+final class CanvasInteractionState: ObservableObject {
+    @Published private(set) var revision = 0
+    func invalidate() { revision &+= 1 }
+}
+
 final class EditorSession: ObservableObject {
+    let canvasInteraction = CanvasInteractionState()
+    var refreshCanvasInteraction: (() -> Void)?
+    var refreshViewportPreview: (() -> Void)?
+
+    private func canvasInteractionChanged() {
+        canvasInteraction.invalidate()
+        refreshCanvasInteraction?()
+    }
+
+    private func viewportChanged() {
+        canvasInteraction.invalidate()
+        refreshViewportPreview?()
+    }
+
     var skipsInitialClipboardCanvasSize = false
     @Published var document: CanvasDocument?
     @Published var canvasFocusRequest = 0
@@ -168,13 +187,13 @@ final class EditorSession: ObservableObject {
             await withCheckedContinuation { projectWaiters.append($0) }
         }
     }
-    @Published var viewport = CanvasViewport()
+    var viewport = CanvasViewport() { didSet { if oldValue != viewport { viewportChanged() } } }
     @Published var tool: NavigationTool = .move
     @Published var collapsedGroupIDs: Set<UUID> = []
-    @Published var cropRect: CGRect?
+    var cropRect: CGRect? { didSet { if oldValue != cropRect { canvasInteractionChanged() } } }
     @Published var cropRatioChoice = "Free"
     @Published var cropError: String?
-    @Published var transformEdit: TransformEdit?
+    var transformEdit: TransformEdit? { didSet { canvasInteractionChanged() } }
     var distortPreviewCache: [UUID: DistortPreviewCache] = [:]
     var distortEffectsCache: [UUID: DistortEffectsCache] = [:]
     /// Document positions a move has just snapped to, drawn as guides while it lasts.
@@ -227,8 +246,8 @@ final class EditorSession: ObservableObject {
     @Published var maskPaintWhite = false { didSet { refreshGradient() } }
     @Published var backgroundColor = PaletteColor.white { didSet { refreshGradient() } }
     @Published var gradientSettings = GradientSettings() { didSet { refreshGradient() } }
-    @Published var gradientEdit: GradientEdit?
-    @Published var lassoDraft: LassoDraft?
+    var gradientEdit: GradientEdit? { didSet { canvasInteractionChanged() } }
+    var lassoDraft: LassoDraft? { didSet { canvasInteractionChanged() } }
     @Published var lassoKind = LassoKind.freehand
     @Published var marqueeKind = LassoKind.rectangle
     @Published var textDraft: TextDraft? { didSet { if oldValue != nil && textDraft == nil { resumeFileRequests() } } }
@@ -239,13 +258,13 @@ final class EditorSession: ObservableObject {
     /// A Line shape's thickness in document pixels.
     @Published var shapeLineWidth: Double = 4
     /// The shape being dragged out with the Shape tool, before it becomes a layer.
-    @Published var shapeDraft: ShapeDraft?
+    var shapeDraft: ShapeDraft? { didSet { canvasInteractionChanged() } }
     @Published var selectionModeChoice = SelectionMode.replace
     /// Mode implied by the Shift/Option keys currently held, nil when neither is.
     @Published var heldSelectionMode: SelectionMode?
     /// The selection as it was when a drag-move began; the drag is one undo step.
     var selectionMoveOrigin: DocumentSelection?
-    @Published var pixelMove: PixelMove?
+    var pixelMove: PixelMove? { didSet { canvasInteractionChanged() } }
     var pixelClipboard: PixelClipboard?
     var copiedLayer: CopiedLayer?
     @Published var levels: LevelsEdit? { didSet { resumeFileRequests() } }
@@ -307,14 +326,14 @@ final class EditorSession: ObservableObject {
     @Published var snapToLayers = ToolDefaults.bool("snapLayers", true) { didSet { ToolDefaults.set(snapToLayers, "snapLayers") } }
     @Published var snapToDocumentBounds = ToolDefaults.bool("snapBounds", true) { didSet { ToolDefaults.set(snapToDocumentBounds, "snapBounds") } }
     @Published var locksGuides = ToolDefaults.bool("lockGuides", false) { didSet { ToolDefaults.set(locksGuides, "lockGuides") } }
-    @Published var guideDrag: GuideDrag?
+    var guideDrag: GuideDrag? { didSet { canvasInteractionChanged() } }
     /// Pixels the Expand / Contract buttons grow or shrink the selection by.
     @Published var selectionExpandAmount = 1
     @Published var selectionContractAmount = 1
     var pendingOpacityDigit: (digit: Int, time: TimeInterval)?
     @Published var colorPicker: ColorPickerState?
     @Published var brushError: String?
-    @Published var brushRevision = 0
+    var brushRevision = 0 { didSet { if oldValue != brushRevision { canvasInteractionChanged() } } }
     /// Not observed by the UI, so controls don't dim for the length of every stroke;
     /// a stroke keeps the settings it started with, so edits made mid-stroke are harmless.
     var brushStroke: BrushStroke? { didSet { resumeFileRequests() } }
@@ -725,10 +744,12 @@ final class EditorSession: ObservableObject {
     }
 
     func toggleLayerVisibility(_ id: UUID) {
-        guard canEditLayers, let index = document?.layers.firstIndex(where: { $0.id == id }) else { return }
-        beginEdit(document?.layers[index].isVisible == true ? "Hide Layer" : "Show Layer")
+        guard canEditLayers, var document,
+              let index = document.layers.firstIndex(where: { $0.id == id }) else { return }
+        beginEdit(document.layers[index].isVisible ? "Hide Layer" : "Show Layer")
         defer { endEdit() }
-        document?.layers[index].isVisible.toggle()
+        document.layers[index].isVisible.toggle()
+        self.document = document
     }
 
     /// Photoshop's eye swipe: pressing an eye shows or hides that layer, and dragging over other eyes gives them the
@@ -741,9 +762,10 @@ final class EditorSession: ObservableObject {
         return visible
     }
     func setVisibilityInSwipe(_ id: UUID, visible: Bool) {
-        guard let index = document?.layers.firstIndex(where: { $0.id == id }),
-              document?.layers[index].isVisible != visible else { return }
-        document?.layers[index].isVisible = visible
+        guard var document, let index = document.layers.firstIndex(where: { $0.id == id }),
+              document.layers[index].isVisible != visible else { return }
+        document.layers[index].isVisible = visible
+        self.document = document
     }
     func endVisibilitySwipe() { endEdit() }
 
