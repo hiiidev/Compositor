@@ -71,8 +71,8 @@ struct TypeControls: View {
                                     .contentShape(RoundedRectangle(cornerRadius: 4))
                             }
                             .buttonStyle(.plain)
-                            .help("Align " + alignment.rawValue.lowercased())
-                            .accessibilityLabel("Align " + alignment.rawValue.lowercased())
+                            .help(L10n.text("Align ") + L10n.text(alignment.rawValue).lowercased())
+                            .accessibilityLabel(L10n.text("Align ") + L10n.text(alignment.rawValue).lowercased())
                             .accessibilityAddTraits(selected ? .isSelected : [])
                         }
                     }
