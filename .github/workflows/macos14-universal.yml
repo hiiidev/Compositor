@@ -22,17 +22,19 @@ jobs:
         include:
           - runner: macos-15
             arch: arm64
+            xcode: "26.6"
           - runner: macos-15-intel
             arch: x86_64
+            xcode: "26.3"
     runs-on: ${{ matrix.runner }}
 
     steps:
       - name: Checkout
         uses: actions/checkout@v7
 
-      - name: Select Xcode 26.6
+      - name: Select Xcode ${{ matrix.xcode }}
         run: |
-          sudo xcode-select -s /Applications/Xcode_26.6.app/Contents/Developer
+          sudo xcode-select -s "/Applications/Xcode_${{ matrix.xcode }}.app/Contents/Developer"
           xcodebuild -version
           sw_vers
           uname -m
