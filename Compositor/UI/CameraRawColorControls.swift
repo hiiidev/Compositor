@@ -9,6 +9,8 @@ struct CameraRawCurveControls: View {
     private enum Drag { case point(Int), divider(Int), region(WritableKeyPath<CameraRawCurveSettings, Double>, Double) }
     @State private var drag: Drag?
     @State private var selected: Int?
+    @State private var lastClickTime: TimeInterval?
+    @State private var lastClickLocation: CGPoint?
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -25,7 +27,7 @@ struct CameraRawCurveControls: View {
                 .pickerStyle(.segmented)
                 .labelsHidden()
                 .help("RGB changes brightness. Red, green, and blue also shift the color.")
-                .onChange(of: edit?.cameraRawPointChannel) { _, _ in selected = nil; drag = nil }
+                .onValueChangeCompat(of: edit?.cameraRawPointChannel) { _, _ in selected = nil; drag = nil }
             }
             curveGraph
                 .frame(height: 150)
@@ -96,11 +98,10 @@ struct CameraRawCurveControls: View {
                                                                                      : pointDrag(at: value.startLocation, in: size) }
                     continueDrag(value, in: size)
                 }
-                .onEnded { _ in drag = nil })
-            .simultaneousGesture(SpatialTapGesture(count: 2).onEnded { value in
-                guard edit?.cameraRawCurvePage == .point else { return }
-                removePoint(at: value.location, in: size)
-            })
+                .onEnded { value in
+                    handlePointDoubleClick(value, in: size)
+                    drag = nil
+                })
         }
         .background(Color.black.opacity(0.35))
         .clipShape(RoundedRectangle(cornerRadius: 4, style: .continuous))
@@ -116,6 +117,26 @@ struct CameraRawCurveControls: View {
     }
 
     private var selectedPoint: CurvePoint? { selected.flatMap { currentPoints.indices.contains($0) ? currentPoints[$0] : nil } }
+
+    private func handlePointDoubleClick(_ value: DragGesture.Value, in size: CGSize) {
+        guard edit?.cameraRawCurvePage == .point,
+              hypot(value.translation.width, value.translation.height) < 3 else {
+            lastClickTime = nil
+            lastClickLocation = nil
+            return
+        }
+        let now = Date.timeIntervalSinceReferenceDate
+        if let last = lastClickTime, let location = lastClickLocation,
+           now - last < 0.35,
+           hypot(value.location.x - location.x, value.location.y - location.y) < 8 {
+            removePoint(at: value.location, in: size)
+            lastClickTime = nil
+            lastClickLocation = nil
+        } else {
+            lastClickTime = now
+            lastClickLocation = value.location
+        }
+    }
 
     private func amount(_ title: String, _ key: WritableKeyPath<CameraRawCurveSettings, Double>, _ help: String) -> some View {
         slider(title, key, -100...100, 0, help)
