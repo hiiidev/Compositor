@@ -45,7 +45,7 @@ struct RawDevelopSheet: View {
         }
         .padding(24).fixedSize()
         .task(id: revision) { await refreshPreview() }
-        .onChange(of: settings) { _, _ in revision += 1 }
+        .onValueChangeCompat(of: settings) { _, _ in revision += 1 }
     }
 
     /// Develops a screen-sized copy. `task(id:)` cancels the previous one, so dragging a slider
