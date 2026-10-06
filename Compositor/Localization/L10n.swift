@@ -164,3 +164,27 @@ extension NavigationTool {
         return value == key ? label : value
     }
 }
+
+extension ColorPickerTarget {
+    var localizedTitle: String {
+        let picker = L10n.text("Color Picker")
+        let detail: String
+        switch self {
+        case .text:
+            detail = L10n.text("Text color")
+        case .effect(let kind):
+            detail = kind.localizedName + " " + L10n.text("Color").lowercased()
+        case .palette(let background):
+            detail = L10n.text(background ? "Background color" : "Foreground color")
+        case .gradientMap(let highlights):
+            detail = L10n.text(highlights ? "Gradient Map highlights" : "Gradient Map shadows")
+        case .vignette:
+            detail = L10n.text("Vignette") + " " + L10n.text("Color").lowercased()
+        case .dither(let light):
+            detail = L10n.text(light ? "Dither Light Color" : "Dither Dark Color")
+        case .dialog(let title):
+            detail = L10n.text(title)
+        }
+        return picker + " (" + detail + ")"
+    }
+}

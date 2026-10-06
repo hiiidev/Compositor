@@ -177,7 +177,7 @@ final class ColorPickerPanelController: NSObject {
         panel.onClose = { [weak session] in
             if session?.colorPicker != nil { session?.closeColorPicker(commit: false) }
         }
-        panel.show(title: state.target.title,
+        panel.show(title: state.target.localizedTitle,
                    content: ColorPickerSheet(state: state) { [weak session] commit in
                        session?.closeColorPicker(commit: commit)
                    })
