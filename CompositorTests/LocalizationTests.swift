@@ -78,7 +78,9 @@ struct LocalizationTests {
         let zh = Locale(identifier: "zh_Hans")
         #expect(L10n.text("settings.language", locale: zh) == "语言")
         #expect(L10n.text("menu.edit.undo", locale: zh) == "撤销")
-        #expect(L10n.text("toolLabel.type", locale: zh) == "文字 (T)")
+        #expect(L10n.text("toolLabel.type", locale: zh) == "文字工具 (T)")
+        #expect(L10n.text("Font", locale: zh) == "字体")
+        #expect(L10n.text("Type", locale: zh) == "文字")
         #expect(L10n.text("Content-Aware Fill", locale: zh) == "内容识别填充")
         #expect(L10n.text("unknown.localization.key", locale: zh) == "unknown.localization.key")
     }
