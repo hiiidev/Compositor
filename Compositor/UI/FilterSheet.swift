@@ -174,7 +174,7 @@ struct FilterSheet: View {
 
         .disabled(edit?.committing == true)
         // Filter colors preview live while the app's color picker is open.
-        .onChange(of: session.colorPicker?.color) { _, _ in
+        .onValueChangeCompat(of: session.colorPicker?.color) { _, _ in
             session.previewGradientMapColor()
             session.previewVignetteColor()
             session.previewDitherColor()
