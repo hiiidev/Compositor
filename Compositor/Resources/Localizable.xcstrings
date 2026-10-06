@@ -2635,7 +2635,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "类型"
+            "value": "文字"
           }
         }
       }
@@ -7051,7 +7051,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "文字 (T)"
+            "value": "文字工具 (T)"
           }
         }
       }
