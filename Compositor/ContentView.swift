@@ -295,6 +295,9 @@ struct ContentView: View {
                         else if tool == .cloneStamp { CloneStampToolIcon().frame(width: 18, height: 18) }
                         else if tool == .lasso, session.lassoKind == .polygonal { PolygonalLassoToolIcon().frame(width: 18, height: 18) }
                         else if tool == .wand, session.wandMode == .object { ObjectSelectionToolIcon().frame(width: 18, height: 18) }
+                        // Keep the Type tool as a literal T. SF Symbol "textformat" localizes its glyph
+                        // (for example to “格式” in Simplified Chinese), which changes the tool icon itself.
+                        else if tool == .type { Text(verbatim: "T").font(.system(size: 20, weight: .medium)) }
                         // The Marquee's icon follows its shape: a dashed circle in Ellipse mode.
                         else { Image(systemName: tool == .marquee && session.marqueeKind == .ellipse ? "circle.dashed" : session.symbol(for: tool)).font(.system(size: 17)) }
                     }
