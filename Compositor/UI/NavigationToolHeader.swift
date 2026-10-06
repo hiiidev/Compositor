@@ -2,6 +2,12 @@ import SwiftUI
 
 struct NavigationToolHeader: View {
     @ObservedObject var session: EditorSession
+    @ObservedObject private var canvasInteraction: CanvasInteractionState
+
+    init(session: EditorSession) {
+        self.session = session
+        _canvasInteraction = ObservedObject(wrappedValue: session.canvasInteraction)
+    }
     @State private var zoomText = ""
     @State private var displayedZoomText = ""
     @State private var stepper = ArrowStepper()
