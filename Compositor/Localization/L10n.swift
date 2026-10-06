@@ -188,3 +188,61 @@ extension ColorPickerTarget {
         return picker + " (" + detail + ")"
     }
 }
+
+extension L10n {
+    @MainActor
+    static func statusHint(for session: EditorSession, locale: Locale = L10n.currentLocale) -> String {
+        let key: String
+        switch session.tool {
+        case .marquee:
+            key = session.marqueeKind == .ellipse ? "status.marquee.ellipse" : "status.marquee.rectangle"
+        case .wand:
+            key = session.wandMode == .object ? "status.wand.object" : "status.wand.wand"
+        case .lasso:
+            key = session.lassoKind == .freehand ? "status.lasso.freehand" : "status.lasso.polygonal"
+        case .brush:
+            key = session.brushMode == .erase ? "status.brush.erase" : "status.brush.paint"
+        case .blur:
+            key = session.blurMode == .blur ? "status.blur.blur" : session.blurMode == .smudge ? "status.blur.smudge" : "status.blur.liquify"
+        case .cloneStamp: key = "status.cloneStamp"
+        case .spotHealing: key = "status.spotHealing"
+        case .type: key = "status.type"
+        case .shape:
+            key = session.shapeKind == .line ? "status.shape.line" : session.shapeKind == .rectangle ? "status.shape.rectangle" : "status.shape.ellipse"
+        case .gradient: key = "status.gradient"
+        case .crop: key = "status.crop"
+        case .move: key = "status.move"
+        case .hand: key = "status.hand"
+        case .idle: key = "status.idle"
+        case .zoom: key = "status.zoom"
+        case .eyedropper: return text("Eyedropper", locale: locale)
+        }
+        return text(key, locale: locale)
+    }
+}
+
+extension ShortcutDefinition {
+    var localizedTitle: String { localizedTitle(locale: L10n.currentLocale) }
+
+    func localizedTitle(locale: Locale) -> String {
+        if title.hasSuffix(" by 10") {
+            let base = String(title.dropLast(" by 10".count))
+            return String(format: L10n.text("shortcuts.byTen", locale: locale), L10n.text(base, locale: locale))
+        }
+        if title.hasPrefix("Opacity digit "), let digit = title.dropFirst("Opacity digit ".count).first {
+            return String(format: L10n.text("shortcuts.opacityDigit", locale: locale), String(digit))
+        }
+        for prefix in ["Nudge ", "Move selected pixels "] where title.hasPrefix(prefix) {
+            let rest = String(title.dropFirst(prefix.count))
+            let pieces = rest.split(separator: " ", maxSplits: 2).map(String.init)
+            if pieces.count == 3, let distance = Int(pieces[1]) {
+                let directionKey = ["Left": "shortcuts.direction.left", "Right": "shortcuts.direction.right",
+                                    "Up": "shortcuts.direction.up", "Down": "shortcuts.direction.down"][pieces[0]] ?? pieces[0]
+                let direction = L10n.text(directionKey, locale: locale)
+                let key = prefix.hasPrefix("Nudge") ? "shortcuts.nudge" : "shortcuts.movePixels"
+                return String(format: L10n.text(key, locale: locale), direction, distance)
+            }
+        }
+        return L10n.text(title, locale: locale)
+    }
+}
