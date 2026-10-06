@@ -41,12 +41,12 @@ struct TitleBarDragTests {
     private func host(_ workspace: ProjectWorkspace, width: CGFloat) async throws -> (DragRecordingWindow, NSView) {
         let hosting = NSHostingView(rootView: ProjectTabStrip(workspace: workspace)
             .frame(width: width, height: 34, alignment: .leading))
-        hosting.sizingOptions = []
+        if #available(macOS 13.0, *) { hosting.sizingOptions = [] }
         hosting.frame = CGRect(x: 0, y: 0, width: width, height: 34)
         let window = DragRecordingWindow(contentRect: hosting.frame, styleMask: [.titled], backing: .buffered, defer: false)
         window.contentView = hosting
         window.makeKeyAndOrderFront(nil)
-        try await Task.sleep(for: .milliseconds(300))
+        try await Task.sleep(nanoseconds: LegacyDelay.milliseconds(300))
         hosting.layoutSubtreeIfNeeded()
         return (window, hosting)
     }
