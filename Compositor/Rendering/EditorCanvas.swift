@@ -2115,13 +2115,16 @@ final class CanvasView: NSView {
             let multiplier: CGFloat = event.hasPreciseScrollingDeltas ? 1 : 12
             session.viewport.translate(by: CGSize(width: event.scrollingDeltaX * multiplier,
                                                   height: event.scrollingDeltaY * multiplier))
-            redrawRulers()
         }
+        // The macOS 12 Combine compatibility layer can defer the SwiftUI representable update
+        // until event tracking yields. Keep navigation visually live, as upstream Observation does.
+        synchronizeDisplay()
     }
     override func magnify(with event: NSEvent) {
         guard transformDrag == nil, cropDrag == nil, !guideDragging, session.brushStroke == nil, session.warpStroke == nil else { return }
         session.zoom(to: session.viewport.zoom * (1 + event.magnification),
                      anchor: convert(event.locationInWindow, from: nil))
+        synchronizeDisplay()
     }
     override func keyDown(with event: NSEvent) {
         let physicalKey = event.keyCode
