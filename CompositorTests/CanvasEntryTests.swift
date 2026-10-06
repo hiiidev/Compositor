@@ -21,9 +21,9 @@ import UniformTypeIdentifiers
         let session = EditorSession()
         var globalChanges = 0
         let cancellable = session.objectWillChange.sink { globalChanges += 1 }
-        let revision = session.canvasInteraction.revision
         session.viewport.resize(to: CGSize(width: 900, height: 700), backingScale: 2, documentSize: nil)
         globalChanges = 0
+        let revision = session.canvasInteraction.revision
 
         session.viewport.translate(by: CGSize(width: 12, height: -8))
 
