@@ -1,24 +1,24 @@
-name: Release macOS 12+ Universal
+name: Release macOS Universal
 
 on:
   push:
     branches:
-      - release-v1.4.5-macos12
+      - release-v1.4.5-macos
 
 permissions:
   contents: write
 
 concurrency:
-  group: release-v1.4.5-macos12
+  group: release-v1.4.5-macos
   cancel-in-progress: false
 
 jobs:
   release:
-    name: Build and publish v1.4.5-macos12
+    name: Build and publish v1.4.5-macos
     runs-on: macos-15
     env:
       VERSION: "1.4.5"
-      TAG: "v1.4.5-macos12"
+      TAG: "v1.4.5-macos"
 
     steps:
       - name: Checkout
@@ -117,22 +117,22 @@ jobs:
 
           ditto -c -k --sequesterRsrc --keepParent \
             "$EN_DIR/Compositor.app" \
-            "$GITHUB_WORKSPACE/Compositor-$VERSION-macOS12-Universal.zip"
+            "$GITHUB_WORKSPACE/Compositor-$VERSION-macOS-Universal.zip"
 
           ditto -c -k --sequesterRsrc --keepParent \
             "$ZH_DIR/Compositor.app" \
-            "$GITHUB_WORKSPACE/Compositor-$VERSION-macOS12-Universal-zh-Hans.zip"
+            "$GITHUB_WORKSPACE/Compositor-$VERSION-macOS-Universal-zh-Hans.zip"
 
           shasum -a 256 \
-            "Compositor-$VERSION-macOS12-Universal.zip" \
-            "Compositor-$VERSION-macOS12-Universal-zh-Hans.zip" \
+            "Compositor-$VERSION-macOS-Universal.zip" \
+            "Compositor-$VERSION-macOS-Universal-zh-Hans.zip" \
             | tee "$RUNNER_TEMP/SHA256SUMS.txt"
 
       - name: Verify packaged apps
         run: |
           for zip in \
-            "Compositor-$VERSION-macOS12-Universal.zip" \
-            "Compositor-$VERSION-macOS12-Universal-zh-Hans.zip"; do
+            "Compositor-$VERSION-macOS-Universal.zip" \
+            "Compositor-$VERSION-macOS-Universal-zh-Hans.zip"; do
             dir="$RUNNER_TEMP/check-${zip%.zip}"
             mkdir -p "$dir"
             ditto -x -k "$zip" "$dir"
@@ -159,8 +159,8 @@ jobs:
             exit 1
           fi
 
-          EN_SHA="$(shasum -a 256 "Compositor-$VERSION-macOS12-Universal.zip" | awk '{print $1}')"
-          ZH_SHA="$(shasum -a 256 "Compositor-$VERSION-macOS12-Universal-zh-Hans.zip" | awk '{print $1}')"
+          EN_SHA="$(shasum -a 256 "Compositor-$VERSION-macOS-Universal.zip" | awk '{print $1}')"
+          ZH_SHA="$(shasum -a 256 "Compositor-$VERSION-macOS-Universal-zh-Hans.zip" | awk '{print $1}')"
 
           cat > "$RUNNER_TEMP/release-notes.md" <<EOF
           Compatibility build based on upstream **Compositor v$VERSION**.
@@ -168,20 +168,20 @@ jobs:
           ### Downloads
 
           **English / no Chinese resources**
-          `Compositor-$VERSION-macOS12-Universal.zip`
+          `Compositor-$VERSION-macOS-Universal.zip`
 
           **English + 简体中文**
-          `Compositor-$VERSION-macOS12-Universal-zh-Hans.zip`
+          `Compositor-$VERSION-macOS-Universal-zh-Hans.zip`
 
-          Both packages are **Universal 2** and contain **arm64 + x86_64**, with a minimum deployment target of **macOS 12.0 Monterey**.
+          Both packages are **Universal 2** and contain **arm64 + x86_64**, with a minimum deployment target of **macOS 12.0 Monterey** (macOS 12 or later).
 
           The Simplified Chinese package includes a language selector in Settings. A restart is required after changing the app language.
 
           ### SHA-256
 
-          `$EN_SHA  Compositor-$VERSION-macOS12-Universal.zip`
+          `$EN_SHA  Compositor-$VERSION-macOS-Universal.zip`
 
-          `$ZH_SHA  Compositor-$VERSION-macOS12-Universal-zh-Hans.zip`
+          `$ZH_SHA  Compositor-$VERSION-macOS-Universal-zh-Hans.zip`
 
           These compatibility builds are ad-hoc signed rather than notarized. If macOS blocks a build you trust after downloading it, you may clear quarantine with:
 
@@ -189,8 +189,8 @@ jobs:
           EOF
 
           gh release create "$TAG" \
-            "Compositor-$VERSION-macOS12-Universal.zip#English / no Chinese resources" \
-            "Compositor-$VERSION-macOS12-Universal-zh-Hans.zip#简体中文 / English" \
+            "Compositor-$VERSION-macOS-Universal.zip#English / no Chinese resources" \
+            "Compositor-$VERSION-macOS-Universal-zh-Hans.zip#简体中文 / English" \
             --target "$GITHUB_SHA" \
-            --title "Compositor $VERSION — macOS 12+ Universal" \
+            --title "Compositor $VERSION — macOS Universal" \
             --notes-file "$RUNNER_TEMP/release-notes.md"
