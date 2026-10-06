@@ -108,12 +108,19 @@ final class CanvasInteractionState: ObservableObject {
 final class EditorSession: ObservableObject {
     let canvasInteraction = CanvasInteractionState()
     var refreshCanvasInteraction: (() -> Void)?
+    var refreshCanvasOverlay: (() -> Void)?
     var refreshViewportPreview: (() -> Void)?
 
-    private func canvasInteractionChanged(publishGlobal: Bool = false) {
+    private func canvasContentChanged(publishGlobal: Bool = false) {
         if publishGlobal { objectWillChange.send() }
         canvasInteraction.invalidate()
         refreshCanvasInteraction?()
+    }
+
+    private func canvasOverlayChanged(publishGlobal: Bool = false) {
+        if publishGlobal { objectWillChange.send() }
+        canvasInteraction.invalidate()
+        refreshCanvasOverlay?()
     }
 
     private func viewportChanged() {
@@ -194,13 +201,13 @@ final class EditorSession: ObservableObject {
     var cropRect: CGRect? {
         didSet {
             guard oldValue != cropRect else { return }
-            canvasInteractionChanged(publishGlobal: (oldValue == nil) != (cropRect == nil))
+            canvasOverlayChanged(publishGlobal: (oldValue == nil) != (cropRect == nil))
         }
     }
     @Published var cropRatioChoice = "Free"
     @Published var cropError: String?
     var transformEdit: TransformEdit? {
-        didSet { canvasInteractionChanged(publishGlobal: (oldValue == nil) != (transformEdit == nil)) }
+        didSet { canvasContentChanged(publishGlobal: (oldValue == nil) != (transformEdit == nil)) }
     }
     var distortPreviewCache: [UUID: DistortPreviewCache] = [:]
     var distortEffectsCache: [UUID: DistortEffectsCache] = [:]
@@ -255,9 +262,9 @@ final class EditorSession: ObservableObject {
     @Published var backgroundColor = PaletteColor.white { didSet { refreshGradient() } }
     @Published var gradientSettings = GradientSettings() { didSet { refreshGradient() } }
     var gradientEdit: GradientEdit? {
-        didSet { canvasInteractionChanged(publishGlobal: (oldValue == nil) != (gradientEdit == nil)) }
+        didSet { canvasContentChanged(publishGlobal: (oldValue == nil) != (gradientEdit == nil)) }
     }
-    var lassoDraft: LassoDraft? { didSet { canvasInteractionChanged() } }
+    var lassoDraft: LassoDraft? { didSet { canvasOverlayChanged() } }
     @Published var lassoKind = LassoKind.freehand
     @Published var marqueeKind = LassoKind.rectangle
     @Published var textDraft: TextDraft? { didSet { if oldValue != nil && textDraft == nil { resumeFileRequests() } } }
@@ -268,16 +275,16 @@ final class EditorSession: ObservableObject {
     /// A Line shape's thickness in document pixels.
     @Published var shapeLineWidth: Double = 4
     /// The shape being dragged out with the Shape tool, before it becomes a layer.
-    var shapeDraft: ShapeDraft? { didSet { canvasInteractionChanged() } }
+    var shapeDraft: ShapeDraft? { didSet { canvasContentChanged() } }
     @Published var selectionModeChoice = SelectionMode.replace
     /// Mode implied by the Shift/Option keys currently held, nil when neither is.
     @Published var heldSelectionMode: SelectionMode?
     /// The selection as it was when a drag-move began; the drag is one undo step.
     var selectionMoveOrigin: DocumentSelection?
     /// During a drag, keep the moving outline out of the published document. It is committed once on mouse-up.
-    var selectionMovePreview: DocumentSelection? { didSet { canvasInteractionChanged() } }
+    var selectionMovePreview: DocumentSelection? { didSet { canvasOverlayChanged() } }
     var pixelMove: PixelMove? {
-        didSet { canvasInteractionChanged(publishGlobal: (oldValue == nil) != (pixelMove == nil)) }
+        didSet { canvasContentChanged(publishGlobal: (oldValue == nil) != (pixelMove == nil)) }
     }
     var pixelClipboard: PixelClipboard?
     var copiedLayer: CopiedLayer?
@@ -340,14 +347,14 @@ final class EditorSession: ObservableObject {
     @Published var snapToLayers = ToolDefaults.bool("snapLayers", true) { didSet { ToolDefaults.set(snapToLayers, "snapLayers") } }
     @Published var snapToDocumentBounds = ToolDefaults.bool("snapBounds", true) { didSet { ToolDefaults.set(snapToDocumentBounds, "snapBounds") } }
     @Published var locksGuides = ToolDefaults.bool("lockGuides", false) { didSet { ToolDefaults.set(locksGuides, "lockGuides") } }
-    var guideDrag: GuideDrag? { didSet { canvasInteractionChanged() } }
+    var guideDrag: GuideDrag? { didSet { canvasOverlayChanged() } }
     /// Pixels the Expand / Contract buttons grow or shrink the selection by.
     @Published var selectionExpandAmount = 1
     @Published var selectionContractAmount = 1
     var pendingOpacityDigit: (digit: Int, time: TimeInterval)?
     @Published var colorPicker: ColorPickerState?
     @Published var brushError: String?
-    var brushRevision = 0 { didSet { if oldValue != brushRevision { canvasInteractionChanged() } } }
+    var brushRevision = 0 { didSet { if oldValue != brushRevision { canvasContentChanged() } } }
     /// Not observed by the UI, so controls don't dim for the length of every stroke;
     /// a stroke keeps the settings it started with, so edits made mid-stroke are harmless.
     var brushStroke: BrushStroke? { didSet { resumeFileRequests() } }
