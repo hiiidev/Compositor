@@ -13,30 +13,38 @@ struct TypeControls: View {
             session.changeTextStyle { $0[keyPath: key] = CGFloat(value) }
         })
     }
+    private var fontNameBinding: Binding<String> {
+        Binding(get: {
+            guard let draft = session.textDraft else { return session.currentTextStyle.fontName }
+            let selection = draft.selection
+            if selection.length == 0 {
+                return draft.style.fontName(at: max(0, selection.location - 1))
+            }
+            return draft.style.uniformFontName(in: selection) ?? ""
+        }, set: { name in
+            let selection = session.textDraft?.selection ?? NSRange()
+            session.changeTextStyle { $0.setFont(name, in: selection) }
+        })
+    }
+
+    private var fontPicker: some View {
+        TypeFontPicker(fontName: fontNameBinding, preview: { step in
+            switch step {
+            case .show(let name): session.previewFont(name)
+            case .revert: session.endFontPreview()
+            case .keep: session.keepFontPreview()
+            }
+        })
+        .frame(width: 210)
+        .help("Font face, including bold and italic variants")
+    }
+
     var body: some View {
         HStack(spacing: 12) {
             Text("Type").font(ToolHeaderStyle.titleFont)
             ScrollView(.horizontal) {
                 HStack(spacing: 10) {
-                    TypeFontPicker(fontName: Binding(get: {
-                        guard let draft = session.textDraft else { return session.currentTextStyle.fontName }
-                        let selection = draft.selection
-                        if selection.length == 0 {
-                            return draft.style.fontName(at: max(0, selection.location - 1))
-                        }
-                        // No single face: an empty title, so choosing the first letter's face still applies to the rest.
-                        return draft.style.uniformFontName(in: selection) ?? ""
-                    }, set: { name in
-                        let selection = session.textDraft?.selection ?? NSRange()
-                        session.changeTextStyle { $0.setFont(name, in: selection) }
-                    }), preview: { step in
-                        switch step {
-                        case .show(let name): session.previewFont(name)
-                        case .revert: session.endFontPreview()
-                        case .keep: session.keepFontPreview()
-                        }
-                    })
-                        .frame(width: 210).help("Font face, including bold and italic variants")
+                    fontPicker
                     TextField("Size", value: number(\.fontSize), format: .number).frame(width: 52)
                         .unitSuffix("px", scrubValue: value(\.fontSize), sensitivity: 1, range: 1...2000, step: 1)
                         .arrowSteps(value: { Double(session.currentTextStyle.fontSize) },
