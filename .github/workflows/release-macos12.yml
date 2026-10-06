@@ -145,8 +145,8 @@ jobs:
             [[ "$(defaults read "$app/Contents/Info" LSMinimumSystemVersion)" == "12.0" ]]
           done
 
-          EN_APP="$RUNNER_TEMP/check-Compositor-$VERSION-macOS12-Universal/Compositor.app"
-          ZH_APP="$RUNNER_TEMP/check-Compositor-$VERSION-macOS12-Universal-zh-Hans/Compositor.app"
+          EN_APP="$RUNNER_TEMP/check-Compositor-$VERSION-macOS-Universal/Compositor.app"
+          ZH_APP="$RUNNER_TEMP/check-Compositor-$VERSION-macOS-Universal-zh-Hans/Compositor.app"
           test ! -d "$EN_APP/Contents/Resources/zh-Hans.lproj"
           test -d "$ZH_APP/Contents/Resources/zh-Hans.lproj"
 
