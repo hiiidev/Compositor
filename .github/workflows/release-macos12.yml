@@ -167,10 +167,8 @@ jobs:
 
           ### Downloads
 
-          **English / no Chinese resources**
           `Compositor-$VERSION-macOS-Universal.zip`
 
-          **English + 简体中文**
           `Compositor-$VERSION-macOS-Universal-zh-Hans.zip`
 
           Both packages are **Universal 2** and contain **arm64 + x86_64**, with a minimum deployment target of **macOS 12.0 Monterey** (macOS 12 or later).
@@ -189,8 +187,8 @@ jobs:
           EOF
 
           gh release create "$TAG" \
-            "Compositor-$VERSION-macOS-Universal.zip#English / no Chinese resources" \
-            "Compositor-$VERSION-macOS-Universal-zh-Hans.zip#简体中文 / English" \
+            "Compositor-$VERSION-macOS-Universal.zip" \
+            "Compositor-$VERSION-macOS-Universal-zh-Hans.zip" \
             --target "$GITHUB_SHA" \
             --title "Compositor $VERSION — macOS Universal" \
             --notes-file "$RUNNER_TEMP/release-notes.md"
