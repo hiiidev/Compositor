@@ -274,6 +274,8 @@ final class EditorSession: ObservableObject {
     @Published var heldSelectionMode: SelectionMode?
     /// The selection as it was when a drag-move began; the drag is one undo step.
     var selectionMoveOrigin: DocumentSelection?
+    /// During a drag, keep the moving outline out of the published document. It is committed once on mouse-up.
+    var selectionMovePreview: DocumentSelection? { didSet { canvasInteractionChanged() } }
     var pixelMove: PixelMove? {
         didSet { canvasInteractionChanged(publishGlobal: (oldValue == nil) != (pixelMove == nil)) }
     }
