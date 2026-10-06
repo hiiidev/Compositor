@@ -1,4 +1,5 @@
 import AppKit
+import Combine
 import Testing
 import UniformTypeIdentifiers
 @testable import Compositor
@@ -14,6 +15,36 @@ import UniformTypeIdentifiers
         canvas.keyDown(with: event)
         #expect(session.tool == .eyedropper)
         #expect(NavigationTool.eyedropper.symbol == "eyedropper")
+    }
+
+    @Test func viewportChangesStayOffTheGlobalSessionPublisher() {
+        let session = EditorSession()
+        var globalChanges = 0
+        let cancellable = session.objectWillChange.sink { globalChanges += 1 }
+        let revision = session.canvasInteraction.revision
+        session.viewport.resize(to: CGSize(width: 900, height: 700), backingScale: 2, documentSize: nil)
+        globalChanges = 0
+
+        session.viewport.translate(by: CGSize(width: 12, height: -8))
+
+        #expect(globalChanges == 0)
+        #expect(session.canvasInteraction.revision > revision)
+        withExtendedLifetime(cancellable) {}
+    }
+
+    @Test func layerVisibilityPublishesDocumentReplacement() throws {
+        let session = EditorSession()
+        session.createDocument(width: 100, height: 100, emptyLayer: true)
+        let id = try #require(session.document?.layers.first?.id)
+        var changes = 0
+        let cancellable = session.objectWillChange.sink { changes += 1 }
+        changes = 0
+
+        session.toggleLayerVisibility(id)
+
+        #expect(session.document?.layers.first?.isVisible == false)
+        #expect(changes > 0)
+        withExtendedLifetime(cancellable) {}
     }
 
     @Test func commandZoomUpdatesOnKeyDownAndRepeat() throws {
