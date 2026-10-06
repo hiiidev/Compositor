@@ -41,7 +41,7 @@ struct TypeControls: View {
 
     var body: some View {
         HStack(spacing: 12) {
-            Text("Type").font(ToolHeaderStyle.titleFont)
+            Text("Font").font(ToolHeaderStyle.titleFont)
             ScrollView(.horizontal) {
                 HStack(spacing: 10) {
                     fontPicker
