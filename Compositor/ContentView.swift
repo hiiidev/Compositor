@@ -104,7 +104,7 @@ struct ContentView: View {
                                     .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
                             }
                         }
-                        .onGeometryChange(for: CGRect.self) { $0.frame(in: .named("editor")) } action: { canvasFrame = $0 }
+                        .onGeometryChangeCompat(for: CGRect.self, of: { $0.frame(in: .named("editor")) }, action: { canvasFrame = $0 })
                     }
                 }
                 PanelResizeEdge(width: $layersPanelWidth, range: LayersPanel.widths)
@@ -164,13 +164,15 @@ struct ContentView: View {
                     .modifier(NewProjectDropTarget(workspace: applicationDelegate?.workspace))
             }
             ToolbarItem(placement: .navigation) { Spacer().frame(width: 1) }
-            if let workspace = applicationDelegate?.workspace {
-                ToolbarItem(placement: .navigation) {
-                    ProjectTabStrip(workspace: workspace)
-                        // As wide as the toolbar allows: the window less the traffic lights and New button before it
-                        // and the zoom controls after it. Bounded, so adding tabs never pushes those aside; the
-                        // strip scrolls instead.
-                        .frame(width: max(200, windowWidth - 352), height: 34, alignment: .center)
+            ToolbarItem(placement: .navigation) {
+                Group {
+                    if let workspace = applicationDelegate?.workspace {
+                        ProjectTabStrip(workspace: workspace)
+                            // As wide as the toolbar allows: the window less the traffic lights and New button before it
+                            // and the zoom controls after it. Bounded, so adding tabs never pushes those aside; the
+                            // strip scrolls instead.
+                            .frame(width: max(200, windowWidth - 352), height: 34, alignment: .center)
+                    }
                 }
             }
             // Absorb all remaining navigation-toolbar width before the zoom controls.
@@ -202,34 +204,34 @@ struct ContentView: View {
 
     var body: some View {
         editorChrome
-        .onChange(of: session.levels == nil) { _, closed in
+        .onValueChangeCompat(of: session.levels == nil) { _, closed in
             if closed { levelsPanel.close() }
             else {
                 levelsPanel.onClose = { session.cancelLevels() }
                 levelsPanel.show(title: "Levels", content: LevelsSheet(session: session))
             }
         }
-        .onChange(of: session.colorRange == nil) { _, closed in
+        .onValueChangeCompat(of: session.colorRange == nil) { _, closed in
             if closed { colorRangePanel.close() }
             else {
                 colorRangePanel.onClose = { session.cancelColorRange() }
                 colorRangePanel.show(title: "Color Range", content: ColorRangeSheet(session: session))
             }
         }
-        .onChange(of: session.hueSaturation == nil) { _, closed in
+        .onValueChangeCompat(of: session.hueSaturation == nil) { _, closed in
             if closed { adjustmentPanel.close() }
             else {
                 adjustmentPanel.onClose = { session.cancelHueSaturation() }
                 adjustmentPanel.show(title: "Hue/Saturation", content: HueSaturationSheet(session: session))
             }
         }
-        .onChange(of: session.effectsEditing) { _, selection in
+        .onValueChangeCompat(of: session.effectsEditing) { _, selection in
             if let selection {
                 effectsPanel.onClose = { session.finishEffectsEditing(commit: false) }
                 effectsPanel.show(title: selection.kind.rawValue, content: EffectsSheet(session: session, kind: selection.kind))
             } else { effectsPanel.close() }
         }
-        .onChange(of: session.document?.layers) { _, layers in
+        .onValueChangeCompat(of: session.document?.layers) { _, layers in
             if let editing = session.effectsEditing,
                layers?.first(where: { $0.id == editing.layerID })?.effects?.contains(editing.kind) != true {
                 if let picker = session.colorPicker, case .effect = picker.target { session.closeColorPicker(commit: false) }
@@ -237,14 +239,14 @@ struct ContentView: View {
                 session.effectsEditingOriginal = nil
             }
         }
-        .onChange(of: session.selectionAmountOperation) { _, operation in
+        .onValueChangeCompat(of: session.selectionAmountOperation) { _, operation in
             if let operation {
                 selectionAmountPanel.onClose = { session.selectionAmountOperation = nil }
                 selectionAmountPanel.show(title: operation.rawValue + " Selection",
                     content: SelectionAmountSheet(session: session, operation: operation))
             } else { selectionAmountPanel.close() }
         }
-        .onChange(of: session.filterEdit == nil) { _, closed in
+        .onValueChangeCompat(of: session.filterEdit == nil) { _, closed in
             if closed { filterPanel.close() }
             else {
                 filterPanel.onClose = { session.cancelFilter() }
@@ -253,7 +255,7 @@ struct ContentView: View {
                                  placement: placement)
             }
         }
-        .onChange(of: session.document == nil) { _, empty in
+        .onValueChangeCompat(of: session.document == nil) { _, empty in
             if !empty { session.canvasFocusRequest += 1 }
         }
         .fileImporter(isPresented: $session.showsImporter,
@@ -432,13 +434,13 @@ private struct ArrowStepping: ViewModifier {
     func body(content: Content) -> some View {
         content
             .focused($focused)
-            .onChange(of: focused) { _, editing in
+            .onValueChangeCompat(of: focused) { _, editing in
                 stepper.editing = editing
                 editing ? stepper.listen(step: step) : stepper.stopListening()
             }
             .onDisappear { stepper.stopListening() }
             .onAppear { refresh() }
-            .onChange(of: value()) { _, _ in refresh() }
+            .onValueChangeCompat(of: value()) { _, _ in refresh() }
     }
     private func refresh() {
         stepper.value = value
@@ -455,8 +457,8 @@ extension View {
     func arrowSteps(_ step: Double = 1, editing: Bool, stepper: ArrowStepper,
                     value: @escaping () -> Double, change: @escaping (Double) -> Void) -> some View {
         onAppear { stepper.value = value; stepper.change = change }
-            .onChange(of: value()) { _, _ in stepper.value = value; stepper.change = change }
-            .onChange(of: editing) { _, active in
+            .onValueChangeCompat(of: value()) { _, _ in stepper.value = value; stepper.change = change }
+            .onValueChangeCompat(of: editing) { _, active in
                 stepper.editing = active
                 stepper.value = value
                 stepper.change = change
@@ -470,6 +472,6 @@ extension View {
 private struct WidthReader: ViewModifier {
     @Binding var width: CGFloat
     func body(content: Content) -> some View {
-        content.onGeometryChange(for: CGFloat.self) { $0.size.width } action: { width = $0 }
+        content.onGeometryChangeCompat(for: CGFloat.self, of: { $0.size.width }, action: { width = $0 })
     }
 }
