@@ -1,0 +1,178 @@
+name: Release macOS Universal RC 2
+
+on:
+  push:
+    branches:
+      - release-v1.4.5-macos-rc2
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-v1.4.5-macos-rc2
+  cancel-in-progress: false
+
+jobs:
+  release:
+    name: Build and publish v1.4.5-macos-rc2
+    runs-on: macos-15
+    env:
+      VERSION: "1.4.5"
+      TAG: "v1.4.5-macos-rc2"
+      PACKAGE: "Compositor-1.4.5-macOS-Universal-RC2"
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Select Xcode 26.3
+        run: |
+          sudo xcode-select -s /Applications/Xcode_26.3.app/Contents/Developer
+          xcodebuild -version
+          sw_vers
+          uname -m
+
+      - name: Confirm upstream version
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          upstream="$(gh api repos/robbietilton/Compositor/releases/latest --jq .tag_name)"
+          echo "Latest upstream release: $upstream"
+          if [[ "$upstream" != "v$VERSION" ]]; then
+            echo "::error::Upstream is $upstream, not v$VERSION. Sync upstream before publishing."
+            exit 1
+          fi
+          grep -q "MARKETING_VERSION = $VERSION;" Compositor.xcodeproj/project.pbxproj
+
+      - name: Resolve packages
+        run: |
+          xcodebuild -resolvePackageDependencies             -project Compositor.xcodeproj             -scheme Compositor             -onlyUsePackageVersionsFromResolvedFile
+
+      - name: Build Universal 2 Release
+        run: |
+          xcodebuild             -project Compositor.xcodeproj             -scheme Compositor             -configuration Release             -destination "generic/platform=macOS"             -derivedDataPath "$RUNNER_TEMP/CompositorUniversal"             ARCHS="arm64 x86_64"             ONLY_ACTIVE_ARCH=NO             MACOSX_DEPLOYMENT_TARGET=12.0             CODE_SIGN_STYLE=Manual             CODE_SIGN_IDENTITY="-"             DEVELOPMENT_TEAM=""             ENABLE_HARDENED_RUNTIME=NO
+
+      - name: Verify Universal 2 app
+        run: |
+          APP="$RUNNER_TEMP/CompositorUniversal/Build/Products/Release/Compositor.app"
+          test -d "$APP"
+          codesign --verify --deep --strict "$APP"
+
+          main="$APP/Contents/MacOS/Compositor"
+          archs="$(lipo -archs "$main")"
+          echo "Compositor architectures: $archs"
+          [[ "$archs" == *arm64* ]]
+          [[ "$archs" == *x86_64* ]]
+
+          min_version="$(defaults read "$APP/Contents/Info" LSMinimumSystemVersion)"
+          echo "Minimum macOS: $min_version"
+          [[ "$min_version" == "12.0" ]]
+
+          failed=0
+          while IFS= read -r -d '' file; do
+            if file "$file" | grep -q "Mach-O"; then
+              binary_archs="$(lipo -archs "$file" 2>/dev/null || true)"
+              echo "$binary_archs  $file"
+              if [[ "$binary_archs" != *arm64* || "$binary_archs" != *x86_64* ]]; then
+                echo "::error::$file is not Universal 2: $binary_archs"
+                failed=1
+              fi
+            fi
+          done < <(find "$APP" -type f -print0)
+          [[ "$failed" -eq 0 ]]
+
+          test -d "$APP/Contents/Resources/zh-Hans.lproj"
+
+      - name: Create English and Chinese packages
+        run: |
+          BASE="$RUNNER_TEMP/CompositorUniversal/Build/Products/Release/Compositor.app"
+          EN_DIR="$RUNNER_TEMP/release-en"
+          ZH_DIR="$RUNNER_TEMP/release-zh"
+          mkdir -p "$EN_DIR" "$ZH_DIR"
+
+          ditto "$BASE" "$EN_DIR/Compositor.app"
+          ditto "$BASE" "$ZH_DIR/Compositor.app"
+
+          rm -rf "$EN_DIR/Compositor.app/Contents/Resources/zh-Hans.lproj"
+          test ! -d "$EN_DIR/Compositor.app/Contents/Resources/zh-Hans.lproj"
+          test -d "$ZH_DIR/Compositor.app/Contents/Resources/zh-Hans.lproj"
+
+          codesign --force --deep --sign - "$EN_DIR/Compositor.app"
+          codesign --verify --deep --strict "$EN_DIR/Compositor.app"
+          codesign --verify --deep --strict "$ZH_DIR/Compositor.app"
+
+          ditto -c -k --sequesterRsrc --keepParent             "$EN_DIR/Compositor.app"             "$GITHUB_WORKSPACE/$PACKAGE.zip"
+
+          ditto -c -k --sequesterRsrc --keepParent             "$ZH_DIR/Compositor.app"             "$GITHUB_WORKSPACE/$PACKAGE-zh-Hans.zip"
+
+          shasum -a 256             "$PACKAGE.zip"             "$PACKAGE-zh-Hans.zip"             | tee "$RUNNER_TEMP/SHA256SUMS.txt"
+
+      - name: Verify packaged apps
+        run: |
+          for zip in "$PACKAGE.zip" "$PACKAGE-zh-Hans.zip"; do
+            dir="$RUNNER_TEMP/check-${zip%.zip}"
+            mkdir -p "$dir"
+            ditto -x -k "$zip" "$dir"
+            app="$dir/Compositor.app"
+            test -d "$app"
+            codesign --verify --deep --strict "$app"
+            archs="$(lipo -archs "$app/Contents/MacOS/Compositor")"
+            [[ "$archs" == *arm64* ]]
+            [[ "$archs" == *x86_64* ]]
+            [[ "$(defaults read "$app/Contents/Info" LSMinimumSystemVersion)" == "12.0" ]]
+          done
+
+          EN_APP="$RUNNER_TEMP/check-$PACKAGE/Compositor.app"
+          ZH_APP="$RUNNER_TEMP/check-$PACKAGE-zh-Hans/Compositor.app"
+          test ! -d "$EN_APP/Contents/Resources/zh-Hans.lproj"
+          test -d "$ZH_APP/Contents/Resources/zh-Hans.lproj"
+
+      - name: Publish GitHub prerelease
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            echo "::error::Release $TAG already exists."
+            exit 1
+          fi
+
+          EN_SHA="$(shasum -a 256 "$PACKAGE.zip" | awk '{print $1}')"
+          ZH_SHA="$(shasum -a 256 "$PACKAGE-zh-Hans.zip" | awk '{print $1}')"
+
+          cat > "$RUNNER_TEMP/release-notes.md" <<EOF
+          Release candidate based on upstream **Compositor v$VERSION**, built from the latest macOS compatibility branch.
+
+          This RC is for real-device regression testing before the next stable macOS compatibility release.
+
+          ### Downloads
+
+          **English**
+          `$PACKAGE.zip`
+
+          **简体中文（含 English）**
+          `$PACKAGE-zh-Hans.zip`
+
+          Both packages are **Universal 2** and contain **arm64 + x86_64**. Minimum deployment target: **macOS 12.0 Monterey**.
+
+          Please focus testing on macOS 12–15, especially:
+          - new canvas creation and project-tab switching
+          - live zoom, trackpad magnification, and canvas panning
+          - PSD import and the conversion/reading sheet
+          - opening/saving .comp projects and PNG/JPEG export
+          - RAW import
+          - Type tool T icon and Font controls
+
+          The Simplified Chinese package includes the language selector in Settings. Restart after changing the app language.
+
+          ### SHA-256
+
+          `$EN_SHA  $PACKAGE.zip`
+
+          `$ZH_SHA  $PACKAGE-zh-Hans.zip`
+
+          These builds are ad-hoc signed rather than notarized. If macOS blocks a build you trust after downloading it:
+
+          `xattr -cr /Applications/Compositor.app`
+          EOF
+
+          gh release create "$TAG"             "$PACKAGE.zip#English"             "$PACKAGE-zh-Hans.zip#简体中文（含 English）"             --target "$GITHUB_SHA"             --title "Compositor $VERSION — macOS Universal RC 2"             --notes-file "$RUNNER_TEMP/release-notes.md"             --prerelease
