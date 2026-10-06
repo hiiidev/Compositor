@@ -116,7 +116,7 @@ struct LassoDraft {
 }
 
 extension EditorSession {
-    var selection: DocumentSelection? { document?.selection }
+    var selection: DocumentSelection? { selectionMovePreview ?? document?.selection }
     var canEditSelection: Bool { canEditLayers }
 
     /// Shift adds, Option (with or without Shift) subtracts; otherwise the options-bar mode.
@@ -274,12 +274,15 @@ extension EditorSession {
         guard let origin = selectionMoveOrigin else { return }
         var shift = CGAffineTransform(translationX: offset.width.rounded(), y: offset.height.rounded())
         guard let path = origin.path.copy(using: &shift) else { return }
-        document?.selection = DocumentSelection(path: path, antialiased: origin.antialiased, feather: origin.feather)
+        selectionMovePreview = DocumentSelection(path: path, antialiased: origin.antialiased, feather: origin.feather)
     }
 
     func endSelectionMove() {
-        guard selectionMoveOrigin != nil else { return }
+        guard let origin = selectionMoveOrigin else { return }
+        let final = selectionMovePreview ?? origin
         selectionMoveOrigin = nil
+        selectionMovePreview = nil
+        if document?.selection != final { document?.selection = final }
         endEdit()
     }
 
