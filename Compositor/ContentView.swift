@@ -6,7 +6,6 @@ struct ContentView: View {
     @AppStorage("layersPanelWidth") private var layersPanelWidth = 252.0
     @Bindable var session: EditorSession
     var applicationDelegate: CompositorApplicationDelegate? = nil
-    @Environment(\.openWindow) private var openWindow
     @State private var canvasFrame: CGRect = .zero
     @State private var levelsPanel = FloatingPanelController(name: "levelsPanel")
     @State private var adjustmentPanel = FloatingPanelController(name: "adjustmentPanel")
@@ -154,7 +153,7 @@ struct ContentView: View {
                     .allowsHitTesting(false)
             }
         }
-        .onAppear { applicationDelegate?.showEditor = { openWindow(id: "editor") } }
+        .onAppear { applicationDelegate?.showEditor = { applicationDelegate?.showEditorWindow() } }
         .preferredColorScheme(.dark)
         .navigationTitle(session.projectURL?.deletingPathExtension().lastPathComponent ?? "Untitled")
         .toolbar {
