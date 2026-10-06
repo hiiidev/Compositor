@@ -1,6 +1,5 @@
 import AppKit
 import UniformTypeIdentifiers
-import Combine
 
 @MainActor
 final class ProjectTab: Identifiable {
@@ -23,7 +22,6 @@ final class ProjectWorkspace: ObservableObject {
     @Published var isManaging = false
     weak var window: NSWindow?
     private var nextNumber = 2
-    private var childCancellables = Set<AnyCancellable>()
     var current: ProjectTab { tabs.first { $0.id == selectedID } ?? tabs[0] }
     var canSwitch: Bool {
         let s = current.session
@@ -35,21 +33,13 @@ final class ProjectWorkspace: ObservableObject {
         first.session.skipsInitialClipboardCanvasSize = true
         tabs = [first]; selectedID = first.id
         first.controller.workspace = self
-        observe(first)
     }
-    private func observe(_ tab: ProjectTab) {
-        tab.session.objectWillChange
-            .sink { [weak self] _ in self?.objectWillChange.send() }
-            .store(in: &childCancellables)
-    }
-
     @discardableResult
     func addTab(reuseEmpty: Bool = true) -> ProjectTab {
         if reuseEmpty, tabs.count == 1, current.session.document == nil { return current }
         let tab = ProjectTab(name: "Untitled \(nextNumber)")
         nextNumber += 1
         tab.controller.workspace = self; tab.controller.window = window
-        observe(tab)
         tabs.append(tab); selectedID = tab.id
         return tab
     }
@@ -102,7 +92,7 @@ final class ProjectWorkspace: ObservableObject {
         tab.controller.window = window
         guard await tab.controller.open(url) else { return false }
         if tabs.count == 1, current.session.document == nil { tabs.removeAll() }
-        tab.controller.workspace = self; observe(tab); tabs.append(tab); selectedID = tab.id
+        tab.controller.workspace = self; tabs.append(tab); selectedID = tab.id
         return true
     }
     func close(_ id: UUID) async {
