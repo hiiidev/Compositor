@@ -13,29 +13,11 @@ struct ProjectWorkspaceView: View {
     }
 
     var body: some View {
-        ProjectSessionView(tab: workspace.current, applicationDelegate: applicationDelegate)
+        ContentView(session: workspace.current.session, applicationDelegate: applicationDelegate)
             .id(workspace.current.id)
             .disabled(workspace.isManaging)
-    }
-}
-
-private struct ProjectSessionView: View {
-    let tab: ProjectTab
-    let applicationDelegate: CompositorApplicationDelegate
-    @ObservedObject private var session: EditorSession
-
-    init(tab: ProjectTab, applicationDelegate: CompositorApplicationDelegate) {
-        self.tab = tab
-        self.applicationDelegate = applicationDelegate
-        _session = ObservedObject(wrappedValue: tab.session)
-    }
-
-    var body: some View {
-        ContentView(session: session, applicationDelegate: applicationDelegate)
-            .psdConversionSheet(session)
-            .rawDevelopSheet(session)
             .background {
-                ProjectWindowBridge(controller: tab.controller).frame(width: 0, height: 0)
+                ProjectWindowBridge(controller: workspace.current.controller).frame(width: 0, height: 0)
             }
     }
 }
