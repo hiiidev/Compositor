@@ -11,7 +11,7 @@ struct CropControls: View {
             Picker("Ratio", selection: $session.cropRatioChoice) {
                 ForEach(["Free", "Original", "1:1", "4:3", "3:4", "16:9", "9:16"], id: \.self) { Text($0) }
             }.frame(width: 170)
-                .onChange(of: session.cropRatioChoice) { _, _ in session.changeCropRatio() }
+                .onValueChangeCompat(of: session.cropRatioChoice) { _, _ in session.changeCropRatio() }
             if let rect = session.cropRect {
                 Text("\(Int(rect.width)) × \(Int(rect.height)) px").monospacedDigit()
             }
