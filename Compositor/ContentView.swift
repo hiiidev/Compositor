@@ -329,7 +329,7 @@ struct ContentView: View {
     private var statusBar: some View {
         HStack(spacing: 16) {
             if let document = session.document {
-                Text(session.viewport.zoom, format: .percent.precision(.fractionLength(0...1)))
+                CanvasZoomStatus(session: session)
                     .frame(width: 62, alignment: .leading).accessibilityIdentifier("zoomStatus")
                 Text(String(format: L10n.text("canvas.dimensions"), document.width, document.height)).accessibilityIdentifier("canvasDimensions")
                 Text("sRGB · Transparent")
@@ -348,6 +348,20 @@ struct ContentView: View {
         .font(.system(size: 11).monospacedDigit()).foregroundStyle(.secondary)
         .padding(.horizontal, 18).frame(height: 30)
         .accessibilityElement(children: .contain)
+    }
+}
+
+private struct CanvasZoomStatus: View {
+    let session: EditorSession
+    @ObservedObject private var canvasInteraction: CanvasInteractionState
+
+    init(session: EditorSession) {
+        self.session = session
+        _canvasInteraction = ObservedObject(wrappedValue: session.canvasInteraction)
+    }
+
+    var body: some View {
+        Text(session.viewport.zoom, format: .percent.precision(.fractionLength(0...1)))
     }
 }
 
